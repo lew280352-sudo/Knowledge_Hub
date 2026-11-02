@@ -28,3 +28,11 @@ summary:focus-visible,textarea:focus-visible{outline:3px solid var(--color-focus
 .physics-figure{background:var(--panel)}
 @media(max-width:700px){.concept-checkpoint,.wave-lab{padding:var(--space-4)}.lesson-level{font-size:var(--text-xs)}.lesson-actions{flex-wrap:wrap}.variable-table td,.variable-table th{padding:var(--space-2)}.wave-lab .physics-figure{margin-left:-8px;margin-right:-8px}.wave-lab .diagram-controls{grid-template-columns:1fr}.lesson-content{padding:var(--space-4)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.review-method,.exploratory-review p{font-size:var(--text-sm);line-height:1.9;margin:var(--space-3) 0}
+.review-list{list-style:none;padding:0;margin:var(--space-4) 0}
+.review-list>li{border-top:1px solid var(--line);padding:var(--space-4) 0}
+.review-list>li p{font-size:var(--text-sm);margin-top:var(--space-2);line-height:1.9}
+.review-list .button-row{column-gap:var(--space-5);margin-top:var(--space-2)}
+.review-footer{flex-wrap:wrap}
+.practice-review{padding:var(--space-4);border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:var(--space-5);background:var(--surface);font-size:var(--text-sm)}
+.review-card h3{overflow-wrap:anywhere}

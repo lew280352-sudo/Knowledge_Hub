@@ -1,4 +1,5 @@
 import { stages, sourceQuestions, chapters, getStage } from '../curriculum.ts';
+import {deriveReview} from '../review.ts';
 import {defaultPreferences,difficultyOptions,goalOptions} from '../learning.ts';
 import { generateQuestion, publicQuestion } from '../questions.ts';
 import type { Attempt, ChapterId, LearningState, LearningPreferences, Progress, QuestionSnapshot, ReviewedAttempt } from '../question-types.ts';
@@ -44,6 +45,21 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
   if(!result.meta?.changes)throw new StoreError('conflict',409);
   return {difficulty:input.difficulty,goal:input.goal,onboardingCompleted:true,revision,updatedAt};
  }
+ async function readReview(user:string){
+  identity(user);
+  // Rank whole attempts, not individual questions: repeated concepts in one test
+  // retain all missed/blank evidence. Active attempts never enter this query.
+  const evidence=await all(`SELECT * FROM (
+   SELECT a.id AS attempt_id,a.submitted_at,a.answers,
+    json_extract(q.value,'$.sourceId') AS source_id,
+    json_extract(q.value,'$.id') AS question_id,
+    json_extract(q.value,'$.answer') AS expected,
+    DENSE_RANK() OVER (PARTITION BY json_extract(q.value,'$.sourceId') ORDER BY a.submitted_at DESC,a.created_at DESC,a.id DESC) AS source_rank
+   FROM exam_attempts a,json_each(a.questions) q
+   WHERE a.user_id=? AND a.status='submitted'
+  ) WHERE source_rank=1`,user);
+  return deriveReview(evidence);
+ }
  async function readState(user:string):Promise<LearningState&{bestScores:Record<string,number>;stats:{games:number;submittedAttempts:number}}>{
   identity(user);
   const expired=await all("SELECT * FROM exam_attempts WHERE user_id=? AND status='active' AND deadline IS NOT NULL AND deadline<=?",user,now());
@@ -53,7 +69,7 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
   const gameRows=await all('SELECT * FROM game_runs WHERE user_id=? ORDER BY created_at DESC LIMIT 100',user);
   const best=await all("SELECT stage_id,MAX(score) AS best FROM exam_attempts WHERE user_id=? AND status='submitted' AND stage_id IS NOT NULL GROUP BY stage_id",user);
   const totals=await first("SELECT (SELECT COUNT(*) FROM game_runs WHERE user_id=?) AS games,(SELECT COUNT(*) FROM exam_attempts WHERE user_id=? AND status='submitted') AS submitted_attempts",user,user);
-  return {preferences:await readPreferences(user),stats:{games:totals.games,submittedAttempts:totals.submitted_attempts},displayName:'',lessons:lessonRows.map(r=>({stageId:r.stage_id,step:r.step,completed:parsed(r.completed),revision:r.revision,updatedAt:r.updated_at})),attempts:attemptRows.map(r=>({id:r.id,stageId:r.stage_id,chapter:r.chapter,status:r.status,revision:r.revision,createdAt:r.created_at,submittedAt:r.submitted_at,deadline:r.deadline,currentIndex:r.current_index,questionCount:r.question_count,answeredCount:r.answered_count,...(r.status==='submitted'?{score:r.score,correctCount:r.correct_count}:{})})),games:gameRows.map(r=>({id:r.id,stageId:r.stage_id,correct:r.correct,total:r.total,createdAt:r.created_at})),bestScores:Object.fromEntries(best.map(r=>[r.stage_id,r.best]))};
+  return {preferences:await readPreferences(user),review:await readReview(user),stats:{games:totals.games,submittedAttempts:totals.submitted_attempts},displayName:'',lessons:lessonRows.map(r=>({stageId:r.stage_id,step:r.step,completed:parsed(r.completed),revision:r.revision,updatedAt:r.updated_at})),attempts:attemptRows.map(r=>({id:r.id,stageId:r.stage_id,chapter:r.chapter,status:r.status,revision:r.revision,createdAt:r.created_at,submittedAt:r.submitted_at,deadline:r.deadline,currentIndex:r.current_index,questionCount:r.question_count,answeredCount:r.answered_count,...(r.status==='submitted'?{score:r.score,correctCount:r.correct_count}:{})})),games:gameRows.map(r=>({id:r.id,stageId:r.stage_id,correct:r.correct,total:r.total,createdAt:r.created_at})),bestScores:Object.fromEntries(best.map(r=>[r.stage_id,r.best]))};
  }
  async function saveLesson(user:string,input:{stageId:string;step:number;completed:number[];revision:number}):Promise<Progress>{
   identity(user);const stage=getStage(input.stageId);invalid(stage&&Number.isInteger(input.step)&&input.step>=0&&input.step<stage.steps.length&&Array.isArray(input.completed)&&input.completed.every(n=>Number.isInteger(n)&&n>=0&&n<stage.steps.length)&&Number.isInteger(input.revision)&&input.revision>=0);
@@ -96,5 +112,5 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
   if(!r.meta?.changes)throw new StoreError('conflict',409);return toAttempt(await rowFor(user,id));
  }
  async function submitAttempt(user:string,id:string,revision:number){invalid(Number.isInteger(revision)&&revision>=0);const row=await rowFor(user,id);return submitRow(row,revision,!!row.deadline&&row.deadline<=now());}
- return {readState,readPreferences,savePreferences,saveLesson,saveGame,createAttempt,getAttempt,updateAttempt,submitAttempt};
+ return {readState,readReview,readPreferences,savePreferences,saveLesson,saveGame,createAttempt,getAttempt,updateAttempt,submitAttempt};
 }

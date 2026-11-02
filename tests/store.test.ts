@@ -102,3 +102,18 @@ test('additive preference migration preserves existing lessons and exact histori
  assert.equal(sqlite.prepare('SELECT completed FROM lesson_progress').get()?.completed,'[0,1]');
  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM learner_preferences').get()?.n,0);sqlite.close();
 });
+
+test('review uses only latest submitted concept evidence, includes combined exams and clears after recovery',async()=>{
+ const {store,sqlite,tick}=setup();
+ const a=await store.createAttempt('alice',{stageId:'s01',count:14});
+ const snapshot=()=>JSON.parse((sqlite.prepare('SELECT questions FROM exam_attempts WHERE id=?').get(a.id) as {questions:string}).questions);
+ const qs=snapshot();const answers=Object.fromEntries(qs.map((q:any,i:number)=>[q.id,i===0?q.choices.find((c:string)=>c!==q.answer):q.answer]));
+ const saved=await store.updateAttempt('alice',a.id,{revision:0,answers,currentIndex:0,eventId:'review-wrong'});await store.submitAttempt('alice',a.id,saved.revision);
+ const review=await store.readReview('alice');assert.equal(review.length,1);assert.equal(review[0].sourceId,qs[0].sourceId);assert.equal(review[0].incorrectCount,1);assert.equal(review[0].questionCount,2);
+ assert.ok(!JSON.stringify(review).includes('explanation'));assert.ok(!('expected' in review[0]));assert.deepEqual(await store.readReview('bob'),[]);
+ tick(1000);const active=await store.createAttempt('alice',{chapter:'waves',count:70});assert.deepEqual(await store.readReview('alice'),review);
+ await store.submitAttempt('alice',active.id,0);const blank=await store.readReview('alice');assert.equal(blank.find(r=>r.sourceId===qs[0].sourceId)?.incorrectCount,0);assert.ok(blank.every(r=>r.unansweredCount>0));
+ tick(1000);const recovery=await store.createAttempt('alice',{chapter:'waves',count:70});const raw=sqlite.prepare('SELECT questions FROM exam_attempts WHERE id=?').get(recovery.id) as {questions:string};const correct=Object.fromEntries(JSON.parse(raw.questions).map((q:any)=>[q.id,q.answer]));
+ const repaired=await store.updateAttempt('alice',recovery.id,{revision:0,answers:correct,currentIndex:0,eventId:'review-recovery'});await store.submitAttempt('alice',recovery.id,repaired.revision);
+ assert.deepEqual(await store.readReview('alice'),[]);assert.equal((await store.getAttempt('alice',a.id)).score,saved.questions.length?93:0);
+});
