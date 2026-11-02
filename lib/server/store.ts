@@ -1,6 +1,7 @@
 import { stages, sourceQuestions, chapters, getStage } from '../curriculum.ts';
+import {defaultPreferences,difficultyOptions,goalOptions} from '../learning.ts';
 import { generateQuestion, publicQuestion } from '../questions.ts';
-import type { Attempt, ChapterId, LearningState, Progress, QuestionSnapshot, ReviewedAttempt } from '../question-types.ts';
+import type { Attempt, ChapterId, LearningState, LearningPreferences, Progress, QuestionSnapshot, ReviewedAttempt } from '../question-types.ts';
 export type Statement={bind(...args:unknown[]):Statement;first():Promise<any>;all():Promise<{results:any[]}>;run():Promise<{meta?:{changes?:number}}>};
 export type SqlDatabase={prepare(sql:string):Statement};
 export class StoreError extends Error{status:number;constructor(message:string,status=400){super(message);this.status=status;}}
@@ -30,6 +31,19 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
   return toAttempt(await rowFor(row.user_id,row.id)) as ReviewedAttempt;
  }
  async function getAttempt(user:string,id:string):Promise<Attempt|ReviewedAttempt>{const row=await rowFor(user,id);if(row.status==='active'&&row.deadline&&row.deadline<=now())return submitRow(row,row.revision,true);return toAttempt(row);}
+ async function readPreferences(user:string):Promise<LearningPreferences>{
+  identity(user);const row=await first('SELECT * FROM learner_preferences WHERE user_id=?',user);
+  return row?{difficulty:row.difficulty,goal:row.goal,onboardingCompleted:!!row.onboarding_completed,revision:row.revision,updatedAt:row.updated_at}:{...defaultPreferences};
+ }
+ async function savePreferences(user:string,input:LearningPreferences):Promise<LearningPreferences>{
+  identity(user);invalid(difficultyOptions.some(o=>o.id===input.difficulty)&&goalOptions.some(o=>o.id===input.goal)&&input.onboardingCompleted===true&&Number.isInteger(input.revision)&&input.revision>=0);
+  const revision=input.revision+1,updatedAt=now();
+  const result=input.revision===0
+   ?await run('INSERT INTO learner_preferences (user_id,difficulty,goal,onboarding_completed,revision,updated_at) VALUES (?,?,?,1,?,?) ON CONFLICT(user_id) DO NOTHING',user,input.difficulty,input.goal,revision,updatedAt)
+   :await run('UPDATE learner_preferences SET difficulty=?,goal=?,onboarding_completed=1,revision=?,updated_at=? WHERE user_id=? AND revision=?',input.difficulty,input.goal,revision,updatedAt,user,input.revision);
+  if(!result.meta?.changes)throw new StoreError('conflict',409);
+  return {difficulty:input.difficulty,goal:input.goal,onboardingCompleted:true,revision,updatedAt};
+ }
  async function readState(user:string):Promise<LearningState&{bestScores:Record<string,number>;stats:{games:number;submittedAttempts:number}}>{
   identity(user);
   const expired=await all("SELECT * FROM exam_attempts WHERE user_id=? AND status='active' AND deadline IS NOT NULL AND deadline<=?",user,now());
@@ -39,7 +53,7 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
   const gameRows=await all('SELECT * FROM game_runs WHERE user_id=? ORDER BY created_at DESC LIMIT 100',user);
   const best=await all("SELECT stage_id,MAX(score) AS best FROM exam_attempts WHERE user_id=? AND status='submitted' AND stage_id IS NOT NULL GROUP BY stage_id",user);
   const totals=await first("SELECT (SELECT COUNT(*) FROM game_runs WHERE user_id=?) AS games,(SELECT COUNT(*) FROM exam_attempts WHERE user_id=? AND status='submitted') AS submitted_attempts",user,user);
-  return {stats:{games:totals.games,submittedAttempts:totals.submitted_attempts},displayName:'',lessons:lessonRows.map(r=>({stageId:r.stage_id,step:r.step,completed:parsed(r.completed),revision:r.revision,updatedAt:r.updated_at})),attempts:attemptRows.map(r=>({id:r.id,stageId:r.stage_id,chapter:r.chapter,status:r.status,revision:r.revision,createdAt:r.created_at,submittedAt:r.submitted_at,deadline:r.deadline,currentIndex:r.current_index,questionCount:r.question_count,answeredCount:r.answered_count,...(r.status==='submitted'?{score:r.score,correctCount:r.correct_count}:{})})),games:gameRows.map(r=>({id:r.id,stageId:r.stage_id,correct:r.correct,total:r.total,createdAt:r.created_at})),bestScores:Object.fromEntries(best.map(r=>[r.stage_id,r.best]))};
+  return {preferences:await readPreferences(user),stats:{games:totals.games,submittedAttempts:totals.submitted_attempts},displayName:'',lessons:lessonRows.map(r=>({stageId:r.stage_id,step:r.step,completed:parsed(r.completed),revision:r.revision,updatedAt:r.updated_at})),attempts:attemptRows.map(r=>({id:r.id,stageId:r.stage_id,chapter:r.chapter,status:r.status,revision:r.revision,createdAt:r.created_at,submittedAt:r.submitted_at,deadline:r.deadline,currentIndex:r.current_index,questionCount:r.question_count,answeredCount:r.answered_count,...(r.status==='submitted'?{score:r.score,correctCount:r.correct_count}:{})})),games:gameRows.map(r=>({id:r.id,stageId:r.stage_id,correct:r.correct,total:r.total,createdAt:r.created_at})),bestScores:Object.fromEntries(best.map(r=>[r.stage_id,r.best]))};
  }
  async function saveLesson(user:string,input:{stageId:string;step:number;completed:number[];revision:number}):Promise<Progress>{
   identity(user);const stage=getStage(input.stageId);invalid(stage&&Number.isInteger(input.step)&&input.step>=0&&input.step<stage.steps.length&&Array.isArray(input.completed)&&input.completed.every(n=>Number.isInteger(n)&&n>=0&&n<stage.steps.length)&&Number.isInteger(input.revision)&&input.revision>=0);
@@ -82,5 +96,5 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
   if(!r.meta?.changes)throw new StoreError('conflict',409);return toAttempt(await rowFor(user,id));
  }
  async function submitAttempt(user:string,id:string,revision:number){invalid(Number.isInteger(revision)&&revision>=0);const row=await rowFor(user,id);return submitRow(row,revision,!!row.deadline&&row.deadline<=now());}
- return {readState,saveLesson,saveGame,createAttempt,getAttempt,updateAttempt,submitAttempt};
+ return {readState,readPreferences,savePreferences,saveLesson,saveGame,createAttempt,getAttempt,updateAttempt,submitAttempt};
 }

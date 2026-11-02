@@ -1,23 +1,24 @@
 /* Shared semantic tokens. Components keep the original aliases below. */
 :root {
-  --color-background: #f6f8f5;
-  --color-surface: #ffffff;
-  --color-surface-soft: #f0f5f1;
-  --color-surface-accent: #edf6f2;
-  --color-sidebar: #fbfcf9;
-  --color-text: #233c37;
-  --color-text-secondary: #566b63;
-  --color-teal: #086b61;
-  --color-teal-hover: #07584f;
-  --color-teal-subtle: #e0f0e9;
-  --color-teal-border: #b5d6c9;
-  --color-border: #dce5dd;
-  --color-control-border: #8ba198;
+  --color-background: #f5f5f0;
+  --color-surface: #fdfdfa;
+  --color-surface-soft: #edeee9;
+  --color-surface-accent: #edeee9;
+  --color-sidebar: #fdfdfa;
+  --color-text: #263b3d;
+  --color-text-secondary: #596764; /* darkened #667371 for small text on tonal panels */
+  --color-text-caption: #667371;
+  --color-teal: #087f8c;
+  --color-teal-hover: #066974;
+  --color-teal-subtle: #e4eff0;
+  --color-teal-border: #afcdd0;
+  --color-border: #d9ded7;
+  --color-control-border: #7b8e8b;
   --color-success: #27654a;
   --color-success-surface: #e7f3e9;
   --color-danger: #a34335;
   --color-warning: #a85f2b;
-  --color-focus: #086b61;
+  --color-focus: #087f8c;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -38,9 +39,9 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --shadow-surface: 0 2px 6px rgb(24 63 45 / 3%);
-  --shadow-hover: 0 5px 14px rgb(24 63 45 / 7%);
-  --shadow-sidebar: 2px 0 12px rgb(24 63 45 / 2%);
+  --shadow-surface: none;
+  --shadow-hover: none;
+  --shadow-sidebar: none;
   --focus-ring: 0 0 0 3px var(--color-surface), 0 0 0 6px var(--color-focus);
   --duration-ui: 160ms;
   --ease-ui: cubic-bezier(.2, .7, .2, 1);

@@ -11,4 +11,13 @@ export type Attempt = { id:string; stageId:string|null; chapter:ChapterId|null; 
 export type ReviewedAttempt = Omit<Attempt,'questions'> & { questions:QuestionSnapshot[] };
 export type Progress = { stageId:string; step:number; completed:number[]; updatedAt:string; revision:number };
 export type AttemptSummary = Omit<Attempt,'questions'|'answers'> & { questionCount:number; answeredCount:number };
-export type LearningState = { lessons:Progress[]; attempts:AttemptSummary[]; games:{id:string; stageId:string; correct:number; total:number; createdAt:string}[]; displayName:string };
+export type LearningState = { lessons:Progress[]; attempts:AttemptSummary[]; games:{id:string; stageId:string; correct:number; total:number; createdAt:string}[]; displayName:string; preferences?:LearningPreferences; review?:ReviewRecommendation[] };
+
+// Optional extensions leave canonical stage/step IDs and historical attempts stable.
+export type Difficulty = 'foundation' | 'standard' | 'advanced';
+export type LearningGoal = 'understanding' | 'exam-prep' | 'problem-solving';
+export type LearningPreferences = {difficulty:Difficulty;goal:LearningGoal;onboardingCompleted:boolean;revision:number;updatedAt:string|null};
+export type ReviewRecommendation = {sourceId:string;stageId:string;topic:string;attemptId:string;reviewedAt:string;incorrectCount:number;unansweredCount:number;questionCount:number};
+export type Checkpoint = {prompt:string;choices:string[];answer:number;explanation:string};
+export type LessonExtension = {intro:string;variables?:{symbol:string;meaning:string;unit:string}[];example?:{prompt:string;steps:string[];formula:string};checkpoint?:Checkpoint;assumption?:string};
+export type DifficultyVariant = {label:string;steps:Partial<Record<number,LessonExtension>>};

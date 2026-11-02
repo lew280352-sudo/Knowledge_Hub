@@ -80,3 +80,25 @@ test('history retains older active and submitted attempts beyond 100 newer attem
  for(let i=0;i<101;i++){const a=await store.createAttempt('alice',{stageId:'s01',count:1});await store.submitAttempt('alice',a.id,0);}
  const state=await store.readState('alice');assert.equal(state.attempts.length,102);assert.ok(state.attempts.some(a=>a.id===oldest.id));assert.equal(state.attempts[0].questionCount,1);assert.ok(!('questions' in state.attempts[0]));
 });
+
+test('learning preferences persist independently, isolate users and reject stale device writes',async()=>{
+ const {store}=setup();const defaults=await store.readPreferences('alice');assert.equal(defaults.difficulty,'standard');assert.equal(defaults.goal,'exam-prep');assert.equal(defaults.revision,0);
+ const p=await store.savePreferences('alice',{...defaults,difficulty:'foundation',goal:'problem-solving',onboardingCompleted:true});
+ assert.equal(p.revision,1);assert.deepEqual((await store.readState('alice')).preferences,p);
+ await assert.rejects(()=>store.savePreferences('alice',{...defaults,difficulty:'advanced',onboardingCompleted:true}),/conflict/);
+ assert.equal((await store.readPreferences('alice')).difficulty,'foundation');assert.equal((await store.readPreferences('bob')).revision,0);
+ await assert.rejects(()=>store.savePreferences('alice',{...p,difficulty:'unknown' as any}),/invalid/);
+ await assert.rejects(()=>store.savePreferences('',p),/unauthorized/);
+ const next=await store.savePreferences('alice',{...p,difficulty:'advanced'});assert.equal(next.goal,'problem-solving');assert.equal(next.revision,2);
+});
+
+test('additive preference migration preserves existing lessons and exact historical snapshots',async()=>{
+ const sqlite=new DatabaseSync(':memory:');sqlite.exec(readFileSync('drizzle/0000_exotic_lightspeed.sql','utf8'));
+ sqlite.prepare('INSERT INTO lesson_progress VALUES (?,?,?,?,?,?)').run('legacy','s01',2,'[0,1]',3,'2026-01-01T00:00:00Z');
+ sqlite.prepare("INSERT INTO exam_attempts (id,user_id,status,revision,questions,answers,current_index,created_at) VALUES (?,?,'submitted',1,?,?,0,?)").run('old-attempt','legacy','[{"id":"original","answer":"unchanged","explanation":["saved"]}]','{"original":"unchanged"}','2026-01-01T00:00:00Z');
+ const before=sqlite.prepare('SELECT * FROM exam_attempts').get();
+ for(const file of readdirSync('drizzle').filter(f=>f.endsWith('.sql')&&!f.startsWith('0000')))sqlite.exec(readFileSync(`drizzle/${file}`,'utf8'));
+ assert.deepEqual(sqlite.prepare('SELECT * FROM exam_attempts').get(),before);
+ assert.equal(sqlite.prepare('SELECT completed FROM lesson_progress').get()?.completed,'[0,1]');
+ assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM learner_preferences').get()?.n,0);sqlite.close();
+});
