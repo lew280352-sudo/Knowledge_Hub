@@ -7,7 +7,7 @@
 ## ใช้งาน
 
 - 20 ด่าน ครอบคลุมคลื่น แสงเชิงคลื่น แสงเชิงรังสี และเสียง จาก PDF 58 หน้าที่แนบใน repo
-- เรียนทีละขั้นพร้อมภาพที่ปรับค่าจริงได้ เกมจับคู่สูตร/ความหมาย และแบบทดสอบท้ายด่าน
+- เลือกเนื้อหาเสริม 3 ระดับครบ 20 ด่าน พร้อมห้องทดลองแบบมีคำถามนำ 19 ด่าน ภาพที่ปรับค่าจริงได้ เกมจับคู่สูตร/ความหมาย และแบบทดสอบท้ายด่าน
 - 70 แม่แบบอิงแนวโจทย์ในเอกสาร สุ่มตัวเลขและตัวเลือกใหม่ พร้อมคำนวณเฉลยตามค่าของชุดนั้น
 - เลือกบท จำนวนข้อ และการจับเวลาได้ เกณฑ์ผ่านด่าน 80%
 - เก็บคำตอบ ตัวเลขโจทย์ คะแนนและเฉลยย้อนหลัง ข้อสอบที่ยังไม่ส่งไม่เปิดเฉลย
@@ -23,6 +23,7 @@
 npm ci
 npm run build
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_exotic_lightspeed.sql
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_curious_trish_tilby.sql
 npm run dev -- --port 5173
 ```
 
@@ -41,6 +42,8 @@ npx playwright test
 Playwright ต้องมีเบราว์เซอร์ Chromium และ dev server ที่พอร์ต 5173 (`npx playwright install chromium` หากเครื่องยังไม่มีเบราว์เซอร์) ทดสอบการเรียนต่อ เกม การสอบ ประวัติ การซิงก์ด้วย browser สอง contexts และการกู้คืนเมื่อบันทึกล้มเหลว
 
 `npm test` ตรวจ 70 baseline fixtures ที่คำนวณแยกจาก generator, 5,600 seeded variants, และ persistence โดยใช้ SQLite จริงผ่าน Node SQLite ไม่ mock ผลการบันทึก
+
+GitHub Actions ตรวจ TypeScript, unit/integration, production build และ Playwright บนฐาน local ที่สร้างใหม่ ใช้เฉพาะบัญชีจำลองและไม่ต้องใช้ production credentials
 
 ## โครงสร้าง
 

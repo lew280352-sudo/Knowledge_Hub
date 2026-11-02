@@ -1,0 +1,30 @@
+import {test,expect,type Page} from '@playwright/test';
+import {stages} from '../../lib/curriculum';
+import {getLessonExtension} from '../../lib/lesson-variants';
+async function stepOne(page:Page,id:string){await page.goto(`/?view=stage&id=${id}&tab=learn`);await page.locator('.step-link').nth(1).click();await expect(page.locator('.wave-lab')).toBeVisible();}
+async function validSvg(page:Page){expect(await page.locator('.lesson-content svg').evaluateAll(nodes=>nodes.every(el=>!/(?:NaN|Infinity)/.test(el.outerHTML)))).toBeTruthy();}
+test('all 20 stages render all three authored levels without writing progress or changing historical attempts',async({page})=>{
+ test.setTimeout(180000);await page.goto('/');const original=await (await page.request.get('/api/state')).json();let difficulty='foundation';
+ await page.route('**/api/state',route=>route.fulfill({json:{...original,lessons:[],preferences:{...original.preferences,difficulty}}}));
+ for(const level of ['foundation','standard','advanced'] as const){difficulty=level;for(const stage of stages){await page.goto(`/?view=stage&id=${stage.id}&tab=learn`);await expect(page.locator('.lesson-extension>p').first()).toHaveText(getLessonExtension(stage.id,level,0)!.intro);await expect(page.locator('.katex-error')).toHaveCount(0);await validSvg(page);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();}}
+ await page.unroute('**/api/state');const after=await (await page.request.get('/api/state')).json();expect(after.lessons).toEqual(original.lessons);expect(after.attempts).toEqual(original.attempts);
+});
+test('guided lab controls honor TIR, lens infinity and signs, unavailable grating orders and integer resonance',async({page})=>{
+ await stepOne(page,'s12');await page.getByLabel('กรอกค่า มุมตกกระทบ',{exact:true}).fill('80');await expect(page.locator('.wave-lab figcaption strong')).toContainText('ไม่มีรังสีหักเหผ่าน');await validSvg(page);
+ await stepOne(page,'s13');await page.getByLabel('กรอกค่า ระยะวัตถุ u',{exact:true}).fill('10');await expect(page.locator('.wave-lab figcaption strong')).toContainText('ภาพที่อนันต์');await validSvg(page);
+ await page.getByLabel('กรอกค่า โฟกัส f',{exact:true}).fill('-10');await expect(page.locator('.wave-lab figcaption strong')).toContainText('ภาพเสมือน หัวตั้ง');await validSvg(page);
+ await stepOne(page,'s07');await page.getByLabel('กรอกค่า ความยาวคลื่นแสง',{exact:true}).fill('700');await page.getByLabel('กรอกค่า ความหนาแน่นเส้นเกรตติง',{exact:true}).fill('1000');await page.getByLabel('กรอกค่า ลำดับที่พิจารณา n',{exact:true}).fill('3');await expect(page.locator('.wave-lab figcaption strong')).toContainText('ไม่มีลำดับนี้');await validSvg(page);
+ await stepOne(page,'s18');await page.getByLabel('กรอกค่า ลำดับโหมด',{exact:true}).fill('2.4');await expect(page.getByLabel('กรอกค่า ลำดับโหมด',{exact:true})).toHaveValue('2');await expect(page.locator('.wave-lab figcaption strong')).toContainText('255 Hz');await page.getByLabel('กรอกค่า ปลายท่อ: 0 เปิดสองปลาย / 1 ปิดหนึ่งปลาย',{exact:true}).fill('0');await expect(page.locator('.wave-lab figcaption strong')).toContainText('340 Hz');await validSvg(page);
+ await stepOne(page,'s09');await page.getByLabel('กรอกค่า ระยะระหว่างช่อง d',{exact:true}).fill('0.1');expect(Number(await page.getByLabel('กรอกค่า ความกว้างแต่ละช่อง a',{exact:true}).inputValue())).toBeLessThan(.1);await validSvg(page);
+ await stepOne(page,'s19');await page.getByLabel('ความเร็วแหล่งกำเนิดเข้าหาผู้ฟัง',{exact:true}).focus();await page.getByLabel('ความเร็วแหล่งกำเนิดเข้าหาผู้ฟัง',{exact:true}).press('End');await expect(page.locator('.wave-lab figcaption strong')).toContainText('894.7 Hz');await validSvg(page);
+});
+test('formative feedback offers hints, explanation, focus-safe retry and relevant lesson return',async({page})=>{
+ const pref=await (await page.request.get('/api/preferences')).json();await page.request.post('/api/preferences',{data:{...pref,difficulty:'foundation'}});
+ await stepOne(page,'s01');const check=page.locator('.wave-lab .concept-checkpoint');await check.getByText('ขอคำใบ้',{exact:true}).click();await expect(check.locator('.checkpoint-hint p')).toBeVisible();await check.getByRole('radio',{name:'2 m',exact:true}).check();await check.getByRole('button',{name:'ตรวจความเข้าใจ',exact:true}).click();await expect(check.getByRole('status')).toContainText('λ = v/f');await expect(check.getByRole('status')).toContainText('ลองทบทวนเหตุผล');
+ await check.getByRole('button',{name:'ลองตอบใหม่',exact:true}).click();await expect(check.getByRole('radio').first()).toBeFocused();await check.getByRole('radio',{name:'8 m',exact:true}).check();await check.getByRole('button',{name:'ตรวจความเข้าใจ',exact:true}).click();await expect(check.getByRole('status')).toContainText('เข้าใจถูกแล้ว');await check.getByRole('link',{name:'กลับไปอ่านคำอธิบาย',exact:true}).click();await expect(page.locator('#lesson-explanation')).toBeFocused();
+ await page.request.post('/api/preferences',{data:{...await (await page.request.get('/api/preferences')).json(),difficulty:pref.difficulty}});
+});
+test('review labels uncertainty, offers self-selected targeted practice and opens retry setup',async({page})=>{
+ await page.goto('/');const state=await (await page.request.get('/api/state')).json();const item={sourceId:'qa-concept',stageId:'s04',topic:'แนวคิดทดสอบการทบทวน',attemptId:'qa-attempt',reviewedAt:'2026-11-02T00:00:00Z',incorrectCount:1,unansweredCount:0,questionCount:1,category:'unclassified',evidence:'answer-only'};
+ await page.route('**/api/state',r=>r.fulfill({json:{...state,review:[item]}}));await page.reload();const review=page.locator('.review-list>li');await expect(review).toContainText('ยังไม่จัดประเภท');await review.getByLabel('อยากทบทวนด้านใด? (เลือกเองได้)').selectOption('unit-conversion');await expect(review.locator('.review-guidance')).toContainText('แปลงให้สอดคล้องกัน');await expect(review).toContainText('ไม่ใช่ผลวินิจฉัย');await review.getByRole('button',{name:'ลองทำข้อสอบด่านนี้ใหม่',exact:true}).click();await expect(page).toHaveURL(/id=s04&tab=test/);await expect(page.locator('.exam-setup')).toBeVisible();
+});
