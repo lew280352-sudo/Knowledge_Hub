@@ -9,9 +9,9 @@ Thai-speaking learners with different foundations, using one private account acr
 ## Product Purpose
 Understand wave, wave-optics, ray-optics and sound concepts, practice new parameter variants, and retain exact historical solutions. Independently choose foundation/standard/advanced teaching and conceptual understanding/exam preparation/problem-solving goals.
 ## Operating Context
-20 canonical stages, 70 mapped source questions, paced lessons, interactive diagrams, matching games, stage tests and combined exams. Resume the same account across devices. First wave lesson has verified representative extensions at three levels; all other stages retain canonical teaching.
+20 canonical stages, 70 mapped source questions, paced lessons, interactive diagrams, matching games, stage tests and combined exams. Resume the same account across devices. All 20 stages have authored Foundation/Standard/Advanced extensions alongside canonical teaching. Guided exploration covers 19 stages; s15 retains static ideal RGB and two-lens teaching.
 ## Capabilities and Constraints
-Private owner access; authenticated server persistence; 80% stage threshold; default 5-question stage test and 20-question untimed combined test; immutable submitted snapshots; no runtime AI. Additive versioned preferences preserve progress. Review uses the latest submitted evidence per source concept, never page views or time spent. Lab free text is temporary, explicitly ungraded and not synced.
+Private owner access; authenticated server persistence; 80% stage threshold; default 5-question stage test and 20-question untimed combined test; immutable submitted snapshots; no runtime AI. Additive versioned preferences preserve progress. Review uses the latest submitted evidence per source concept, never page views or time spent. Answer-only errors remain unclassified; five voluntary review-focus categories are explicitly self-reflection. Lab free text is temporary, explicitly ungraded and not synced.
 ## Evidence on Hand
 58-page user-supplied source PDF. No official answer-key section; worked solutions require independent verification. No fabricated learning statistics or mastery claims.
 ## Product Principles

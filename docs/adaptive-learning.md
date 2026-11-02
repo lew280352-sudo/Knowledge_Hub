@@ -1,95 +1,60 @@
-# Adaptive learning UX — architecture, audit and phased plan
+# Adaptive learning V3.0
 
-## Existing architecture and verified capabilities
+## Current architecture and pre-change audit
 
-Vinext/React/TypeScript renders one LearningApp with URL-query routes for path, stage (learn/game/test), exams, history and formula book. Existing components render paced canonical lessons, parameter-driven SVG physics diagrams, keyboard/touch matching, formal assessments and immutable submitted solutions. `lib/curriculum.ts` owns four chapters, 20 stages and 70 source mappings; `lib/questions.ts` generates numeric variants.
+The latest GitHub main was inspected before changes. Its tree matched the opened private Site. Vinext/React/TypeScript, query routes, shared components and Cloudflare D1 remain in place. V2 already provided independent difficulty/goal preferences, revision conflicts, honest sync states, canonical progress, formative wave practice and submitted-evidence review. The gaps were authored variants beyond s01, guided exploration beyond that wave lab, diagnostic uncertainty and repeatable CI.
 
-Authenticated same-origin APIs use `lib/server/store.ts` and D1 tables for lesson progress, game runs and examination snapshots. Lesson writes merge completed steps; answer writes use revision/event IDs; server scoring and 80% completion are authoritative. Active questions omit answers/explanations. Submitted snapshots remain unchanged. The client reports pending/offline/error states, keeps lesson/exam drafts locally, and refreshes verified account state across devices. Mobile navigation already supports inert background, focus trapping, Escape and focus restoration. Math uses KaTeX with accessible MathML; SVG diagrams and controls are labelled.
+V3 extends those boundaries rather than replacing the application. `lib/curriculum.ts` still owns the same 20 stages, canonical teaching, games and 70 source mappings. Question generation, authentication, API validation, scoring, original tables and submitted snapshots are unchanged.
 
-Missing: persistent independent difficulty/goal preferences, a variant content model, representative difficulty-specific teaching, and deterministic concept review. Existing games, solutions, sync, controls and progress must be extended, not rebuilt.
+## Completed phases
 
-## UX audit
+| Phase | Implementation | Verification |
+| --- | --- | --- |
+| A — Curriculum | `teaching-content.ts` adds Foundation/Standard/Advanced layers for s02–s20 through the existing optional variant API. s01 remains intact. | All 60 variants cover canonical steps; 57 new numerical examples recalculated independently; all equations parse strictly. |
+| B — Physics interaction | Pure constrained models, corrected principal rays/virtual extensions, grating directions, double-slit envelopes and 18 new guided labs. | Boundary/domain, ray intersection, intensity zero/limit and integer-mode tests; browser control checks. |
+| C — Review and feedback | Source concept taxonomy, five review-focus categories, conservative unclassified evidence, voluntary self-reflection, lesson/practice/retry/history actions, hint and retry feedback. | Real SQLite latest-evidence recovery and isolation tests; browser feedback/navigation flows. |
+| D — UX/reliability | Existing academic notebook styling, stacked reasoning input, keyboard focus recovery, numeric/range controls and GitHub Actions. | Responsive, keyboard, reduced motion, existing regression flows; fresh local migration application. |
+| E — Verification | Numerical report, schema/data compatibility checks, browser inspection and release documentation. | See [verification report](v3-verification.md) and [physics report](physics-verification-v3.md). |
 
-The path is easy to browse, but the dashboard does not explain the chosen learning approach or distinguish started from in-progress stages. Its main action does not recognize an all-completed path. Review requires manually inspecting history. Lessons provide controls without a predict/observe/explain structure. Assessment feedback has exact solutions but lacks a direct lesson return. Current tokens differ from the requested original laboratory palette; restore that palette with accessible action/focus variants and flat surfaces.
+## Meaningful difficulty differences
 
-## Prioritized implementation and review boundaries
+Foundation explains terms, quantities/units and physical meaning before guided substitution. Standard combines relationships and multi-step worked examples with independent conceptual questions. Advanced examines assumptions, limits, signs, competing models and physical feasibility. It requires a temporary written reason before checking a conceptual choice; that writing is **not** automatically graded.
 
-1. **Foundation:** additive preferences table/API, defaults `standard` + `exam-prep` for existing users, optional inline onboarding for new accounts only, explicit revision-conflict handling, verified status and dashboard actions/counts. Retain all existing records. Commit and check this phase separately.
-2. **Lesson architecture:** optional typed per-level extensions; canonical stage arrays remain untouched. Only s01 receives authored foundation/standard/advanced material, guided examples, checkpoints and a predict → experiment → observe → explain → apply lab. Switch difficulty without changing step IDs, progress or exams. Check calculations and commit separately.
-3. **Learning feedback:** aggregate only submitted snapshot results by source concept. Latest submitted attempt covering a source replaces older evidence; any missed item in that attempt merits review. Blank answers are labelled incomplete evidence. Show transparent reasons, lesson/game/history actions and exploratory fallback. Preserve formal answer protection and all scoring. Commit separately.
-4. **Validation:** unit/integration checks for preferences, migration preservation, isolation/conflicts, review determinism, physics relationships and curriculum invariants; existing and new browser flows, responsive/keyboard/reduced-motion/contrast checks; production build and private publication.
+All levels retain canonical lesson text. Supplementary content follows existing step IDs: concept/glossary/assumptions, worked example, misconception or transfer/checkpoint, then synthesis where the canonical stage has a fourth step. Examples use a disclosure so learners can attempt first. A stable rotation changes checkpoint presentation order while preserving authored answer indices. No runtime AI or probabilistic mastery estimator is used.
 
-## Data migration and failure behavior
+Preferences remain independent of progress. Changing level neither creates a new stage record nor clears completed steps, games, examination history or best scores. The stage pass threshold remains 80%. The chosen goal adjusts guidance rather than changing formal scoring.
 
-Append a schema-only `learner_preferences` table (user ID primary key, difficulty, goal, onboarding flag, revision, update time); no backfill or changes to original tables. A missing row means the defaults above and revision 0. Existing activity suppresses onboarding. All settings writes use the same authenticated API and same-origin protection as progress. A revision mismatch returns 409; keep the visible draft and require an explicit latest-value reload before retrying. A failed/offline request never updates the saved preference summary. Preferences are cross-device records; unsaved form edits are not advertised as synchronized. Learning goals guide next-action copy, independently of difficulty. Learning progress remains global to canonical stages, not reset or duplicated by level.
+## Guided labs and physical boundaries
 
-## Implemented boundaries and learning decisions
+19 stages have predict → experiment → observe → explain → apply: the retained s01 wave lab plus 18 stage-specific configurations in `lib/labs.ts`. s15 retains static ideal RGB/two-lens teaching; no decorative simulation was added.
 
-- Difficulty and goal are independent account settings. Difficulty changes only optional teaching layers; canonical step identity, 80% pass threshold and all exam snapshots remain global and unchanged.
-- First-wave extensions are authored for each canonical step at all three levels. Other stages explicitly display the canonical fallback. Guided examples use disclosure controls; conceptual checks and predictions are formative and never submit formal answers.
-- The wave lab fixes v = 4 m/s in a nondispersive medium. It derives λ = v/f and T = 1/f and plots y(x,0) = A sin(2πx/λ) on a fixed 0–12 m axis. Frequency and amplitude controls are keyboard accessible; there is no autoplay. Advanced examples distinguish spatial and temporal phase, specify propagation direction and test assumptions.
-- Source concepts use the existing 70 mappings. Server review reads submitted snapshots only, ranks attempts per source, and groups all occurrences in the latest covering attempt. A correct later covering attempt clears old recommendations. Blanks are labelled incomplete evidence. Nothing infers mastery from visits, time, game duration or selected difficulty.
-- Practice hints and immediate pair feedback are separate from formal tests. Formal tests retain hidden answers until submission; returned solutions now link directly to the related lesson.
-- Preference storage is additive, user-scoped and compare-and-swap. Migration SQL/metadata are appended; existing tables and snapshots are preserved. No public registration or authentication changes.
+`lib/physics-models.ts` supplies deterministic relationships used by SVG readouts and tests. Snell rejects nonexistent refracted angles. Optics skips f = 0 and treats u = f as an image at infinity. Integer mode/order controls snap fractional numeric input. Slit width stays below center separation; single/double/combined patterns use the appropriate sinc²/cos² models. Grating directions use actual angular geometry. Doppler remains subsonic; Mach geometry remains strictly supersonic. Captions state when a picture is schematic, rescaled, paraxial, far-field or small-angle.
 
-## Physics verification reference
+There is no autoplay. Controls retain native keyboard interaction and labelled values/units. Textual relationships supplement SVGs. Predictions and written reasons are temporary and ungraded; the UI explicitly states that these fields do not sync across devices. Saved canonical progress and preferences continue to sync through D1.
 
-Wave relationships and propagation/phase conventions were checked against [OpenStax University Physics, §16.2 Mathematics of Waves](https://openstax.org/books/university-physics-volume-1/pages/16-2-mathematics-of-waves). Added example values are independently recalculated in `tests/learning.test.ts`; existing question-engine fixtures remain authoritative for all original source mappings.
+## Smart Review evidence policy
 
-## Future improvements (not shipped as implied capability)
+Concept identity is the original source question ID and stage, preserved in `conceptTaxonomy`. Error cause is a separate taxonomy:
 
-- Author and independently review difficulty extensions for the remaining 19 stages before exposing them as multi-level content.
-- Add explicit, consented cross-device storage if learners want to retain free-text lab reasoning; current prediction/reasoning inputs clearly state they are temporary and ungraded.
-- Use a concept taxonomy more detailed than the source-question topic labels only after an editorial physics review. Current review provides transparent evidence, not a mastery score.
-- Consider pagination/SQL tuning if the private account accumulates a much larger attempt history; source-ranked review already limits returned evidence to latest covering attempts.
+- Conceptual understanding
+- Formula selection
+- Unit conversion
+- Calculation
+- Physical assumptions
+- Unclassified when evidence cannot distinguish a cause
 
+Current formal snapshots contain selected choices, not diagnostic reasoning. Every incorrect choice therefore remains **unclassified**; a blank is **insufficient evidence**. Distractor multipliers, page visits, time, difficulty and games do not diagnose a cause. Optional per-choice formative feedback is only shown if explicitly authored; no wrong formal answer is retroactively assigned a misconception.
 
-## Final verification
+The learner may choose a focus to see a specific practice suggestion. This is labelled self-reflection, not an automated diagnosis, and is not persisted. It resets with new evidence. No mastery percentage is invented.
 
-- `npx tsc --noEmit`: passed.
-- `npm test`: 23 passed (17 original plus dashboard derivation, preferences, migration preservation, review recovery and wave/variant verification).
-- `npx playwright test`: 13 passed (9 incumbent flows plus four adaptive flows covering onboarding, independent settings, cross-device persistence/conflicts, offline/save failure, difficulty switching without progress loss, guided reasoning, fixed-speed controls and review navigation).
-- axe-core 4.10.3: zero WCAG A/AA automated violations across 44 route/viewport combinations: dashboard, settings, foundation/advanced wave lesson, canonical fallback, game, exam setup, active exam, submitted review, history and formula book at 320/390/820/1440px.
-- No browser exceptions, page overflow or KaTeX errors in that scan. Long formulas are keyboard-focusable so horizontal equation scrolling remains available at 320px. Focus, category targets, reduced motion and the original mobile focus trap are covered by browser checks.
-- Pale-surface accent text uses `#066974`, while action/diagram/focus accent retains `#087F8C`. This fixes the measured small-text contrast failures from restoring the requested palette. Large stage numbers now use the secondary text token.
-- SVG text contrast remains an axe manual-review item; graph labels use dark ink and mathematical relationships are repeated in readable captions. This is scoped browser/accessibility verification, not a certification of complete WCAG conformance or a manual screen-reader user study.
-- Source diff confirms no changes to the 20 canonical stages, 70 source mappings, generated question templates, identity implementation, formal grading or original migration. No sample learner data is included in source or deployment artifacts.
+Server review still reads only submitted snapshots, selecting the latest covering attempt per source and grouping repeated occurrences. A later covering submission with all occurrences correct clears the old recommendation. Mixed wrong/blank/correct evidence is shown through actual counts. Buttons open the relevant lesson, matching practice, test setup or exact submitted attempt. Retry never starts or submits an exam silently.
 
-The first three implementation commits isolate foundation, lesson architecture and feedback. The final verification commit contains observed accessibility/state fixes, tests and documentation. Browser screenshots/logs are checkout-local QA outputs and are not bundled with the app.
+## Data integrity and release boundaries
 
-## Modified files
-- `DESIGN.md`
-- `PRODUCT.md`
-- `app/adaptive.css`
-- `app/api/preferences/route.ts`
-- `app/dashboard.css`
-- `app/globals.css`
-- `app/layout.tsx`
-- `app/tokens.css`
-- `components/concept-checkpoint.tsx`
-- `components/exam-view.tsx`
-- `components/learning-app.tsx`
-- `components/learning-preferences.tsx`
-- `components/lesson-view.tsx`
-- `components/matching-game.tsx`
-- `components/math.tsx`
-- `components/physics-diagram.tsx`
-- `components/review-panel.tsx`
-- `components/wave-lab.tsx`
-- `db/schema.ts`
-- `docs/adaptive-learning.md`
-- `drizzle/0001_curious_trish_tilby.sql`
-- `drizzle/meta/0001_snapshot.json`
-- `drizzle/meta/_journal.json`
-- `lib/client/sync.ts`
-- `lib/learning.ts`
-- `lib/lesson-variants.ts`
-- `lib/question-types.ts`
-- `lib/review.ts`
-- `lib/server/store.ts`
-- `lib/wave-model.ts`
-- `tests/e2e/adaptive.spec.ts`
-- `tests/learning.test.ts`
-- `tests/store.test.ts`
+V3 adds no table or migration. The prior additive preference migration remains compatible with original lesson/exam data. Existing user-scoped same-origin APIs, answer revision/event deduplication, deadlines, server grading, answer protection, offline drafts and conflict recovery are retained. Active formal questions still omit answers, formulas and worked explanations; pedagogical hints remain inside formative components. Historical snapshots are never rewritten.
 
-Manual follow-up identified the framework's default 50%-alpha textarea placeholder in an axe incomplete case. A separate small follow-up commit gives placeholders the opaque secondary-text token; this changes presentation only. The production build also passed, and the packaged archive contains the additive migration without preview database files or sample learner data.
+The Site keeps its existing project ID and owner-private audience. CI uses a fresh local D1 and local verified mock identity, with no production token or private account data. It runs TypeScript, Node tests, production build and Playwright. Hosted Actions results must be distinguished from locally executed commands.
+
+## Educational follow-up
+
+A physics educator can independently review Thai explanations and classroom suitability; this release's source/calculation checks are not an external expert endorsement. Future diagnostic questions should collect explicit reasoning evidence before enabling automatic cause classification. Optional reason storage would need an explicit additive data design. A calibrated two-lens lab or real-spectrum color experiment can be considered if it improves learning beyond the current static s15 material. Outcome studies are needed before any mastery score or automatic level assignment is justified.

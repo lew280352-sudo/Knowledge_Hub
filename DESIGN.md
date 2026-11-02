@@ -49,7 +49,7 @@ Below 700px, the existing mobile navigation behavior is retained: closed navigat
 
 Difficulty and goal are independently editable through an inline form with clear draft, saving, failure and conflict feedback. New learners are offered optional onboarding; existing activity suppresses it. Dashboard progress and next actions come from saved stages and attempts. Review cards explain submitted evidence and offer lesson, practice and historical-answer actions.
 
-Canonical lessons remain visible at every level. Only the first wave stage has authored extensions: variable definitions, guided calculations, checkpoints, explicit assumptions and a static parameter-driven predict → experiment → observe → explain → apply lab. Other stages label their canonical fallback. Formative practice is clearly distinguished from formal tests.
+Canonical lessons remain visible at every level. All 20 stages have authored extensions: variable definitions, guided calculations, checkpoints and explicit assumptions. Guided predict → experiment → observe → explain → apply labs cover 19 stages; s15 uses static teaching. Formative practice is clearly distinguished from formal tests. Hints use native disclosures; retry restores radio focus and a lesson anchor returns to the current explanation. Advanced reasoning inputs stack vertically. Review shows uncertainty and a labelled self-reflection selector, without claiming an inferred error cause.
 
 The original secondary color `#667371` is retained as a caption token; the small body-text token is darkened to `#596764` for contrast on tonal panels. The primary accent is `#087f8c`. Reusable form, checkpoint, review and lab surfaces live in `app/adaptive.css` and use shared tokens.
 

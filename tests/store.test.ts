@@ -117,3 +117,15 @@ test('review uses only latest submitted concept evidence, includes combined exam
  const repaired=await store.updateAttempt('alice',recovery.id,{revision:0,answers:correct,currentIndex:0,eventId:'review-recovery'});await store.submitAttempt('alice',recovery.id,repaired.revision);
  assert.deepEqual(await store.readReview('alice'),[]);assert.equal((await store.getAttempt('alice',a.id)).score,93);
 });
+
+test('all 20 canonical progress records and submitted snapshots survive every difficulty switch',async()=>{
+ const {store,sqlite}=setup();
+ for(let n=1;n<=20;n++)await store.saveLesson('learner',{stageId:`s${String(n).padStart(2,'0')}`,step:1,completed:[0],revision:0});
+ const exam=await store.createAttempt('learner',{count:20});await store.submitAttempt('learner',exam.id,0);
+ const before=(await store.readState('learner')).lessons,raw=sqlite.prepare('SELECT * FROM exam_attempts WHERE id=?').get(exam.id);
+ for(const difficulty of ['foundation','standard','advanced'] as const){
+  await store.savePreferences('learner',{...await store.readPreferences('learner'),difficulty,onboardingCompleted:true});
+  assert.deepEqual((await store.readState('learner')).lessons,before);
+  assert.deepEqual(sqlite.prepare('SELECT * FROM exam_attempts WHERE id=?').get(exam.id),raw);
+ }
+});
