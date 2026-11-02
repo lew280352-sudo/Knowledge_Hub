@@ -1,37 +1,53 @@
 # Physic Learn visual system
 
-The implemented interface follows the approved lab-notebook direction and Taste editorial-greeting app sheet. Operate surfaces prioritize the next action and saved state; Read surfaces prioritize the explanation, equation and diagram.
+Soft Academic / Scientific Minimalism: an off-white learning workspace with measured teal accents, legible Thai typography, subtle borders and restrained elevation. The existing six dashboard sections, navigation hierarchy, curriculum, data and learning flows are retained.
 
-## Tokens
+## Shared design tokens
+
+`app/tokens.css` is the reusable source of truth. The original aliases (`--ground`, `--surface`, `--ink`, `--muted`, `--accent`, etc.) point to semantic tokens so the existing lesson, game and exam components continue to work.
 
 | Role | Value |
 | --- | --- |
-| Ground | `#f5f5f0` |
-| Surface | `#fdfdfa` |
-| Tonal panel | `#edeee9` |
-| Ink | `#263b3d` |
-| Secondary text | `#667371` |
-| Rule | `#d9ded7` |
-| Wave/measurement accent | `#087f8c` |
-| Secondary ray | `#b66932` |
-| Body/type | Self-hosted IBM Plex Sans Thai, 400/500/600/700 |
-| Base type | 15px / 1.7; lesson copy 14–15px / 2.05 |
-| Surface radius | 14px; controls 8–9px |
+| Canvas | `#f6f8f5` |
+| Surface | `#ffffff` |
+| Sidebar | `#fbfcf9` |
+| Featured lesson | `#edf6f2` |
+| Primary text | `#233c37` |
+| Secondary text | `#566b63` |
+| Teal action / focus | `#086b61` |
+| Teal hover | `#07584f` |
+| Teal selection tint | `#e0f0e9` |
+| Border | `#dce5dd` |
+| Completion text | `#27654a` |
+| Font | Self-hosted IBM Plex Sans Thai, 400/500/600/700 |
+| Spacing | 4, 8, 12, 16, 20, 24, 32, 40, 48, 64px |
+| Type | 13, 14, 16, 18, 22px plus fluid headings |
+| Radius | 8px controls; 12–16px panels; 20px available for larger surfaces |
+| Elevation | Small neutral shadows; no glow, glass, gradients or decorative animation |
+| Transition | 160ms for color, border and subtle elevation; zero with reduced motion |
 
 ## Composition
 
-240px labelled navigation beside a centered content area up to 1100px. The home introduces the next useful lesson beside a measured wave diagram, then four genuine counts and the chapter trail. Chapter counts derive from server scores; stage numbers carry the learning sequence. Muted navigation never competes with the diagram.
+A labelled 252px sidebar and centered content area up to 1120px. The hero heading retains its original copy and next-learning action. The featured lesson and existing PhysicsDiagram remain visible at every supported viewport, stacking on tablet/mobile. Statistics use a semantic description list and retain their actual server values.
 
-Below 700px, navigation becomes a controlled sheet. Hidden navigation is inert; open navigation traps keyboard focus and Escape returns focus to its trigger. Reading, matching and exam controls stack without page overflow. Diagrams keep their proportions and provide a textual numeric readout and explicit units.
+The learning path retains the category filters and grouped chapter panels. Lesson titles are 15px; metadata is 12–13px instead of 10px. Teal selected filters, a clear current navigation item, reading states and completion checks support scanning without implying progress that has not been earned.
 
-## Components and states
+Below 700px, the existing mobile navigation behavior is retained: closed navigation is inert, open navigation traps keyboard focus, and Escape returns focus to the menu trigger. All filters have at least 44px touch height. The graph stays visible rather than being hidden on tablet/mobile.
 
-Flat tonal surfaces and one-pixel rules; no decorative gradients or shadows. Near-black primary actions; teal encodes measured physics or selection. Success/error use text and icons as well as color. Lucide is the consistent interface icon system; actual GitHub branding uses Simple Icons.
+## Accessible states
 
-Lessons use a numbered outline, a readable explanation, KaTeX equations, parameter-driven SVG and previous/next actions. Matching uses two button columns so touch and keyboard work without dragging. Exams use a compact question index, large answer buttons, a per-attempt save indicator and explicit conflict resolution. Historic solutions compare the answer given with the correct answer and preserve each calculation.
+- Navigation exposes `aria-current`; category buttons expose `aria-pressed`.
+- The reusable `ProgressIndicator` presents the existing passed-stage counts with labelled progressbar semantics. Empty progress renders as zero width.
+- Completion is conveyed by a check and text, in addition to color.
+- Focus is a 3px teal outline with 3px offset; hover does not shift layout.
+- The mobile sync indicator has an image role and an accessible status label.
+- The main region is programmatically focusable for the skip link.
+- Reduced-motion preferences disable transitions.
 
-Loading, empty, offline, save failure, stale revision, deadline expiry and submitted states are distinct. A draft never appears as saved. Motion is limited to small interaction transitions and honors reduced-motion preferences.
+## Preserved functionality
+
+No route, API, database, question engine, curriculum, grading, persistence, synchronization or authentication changes. The existing component framework and physics calculations remain in use. The graph's axis-label position was adjusted solely to keep text clear of plotted data.
 
 ## Verification
 
-Desktop 1440px, tablet 820px and mobile 390px renders inspected. Local Playwright covers navigation, lesson resume, games, exams, history, two contexts sharing D1, conflict resolution and retry after network failure. Asset sources are recorded in `docs/design-direction.md`.
+See `docs/dashboard-redesign.md` for the audit, implementation plan and validation record. Asset provenance remains in `docs/design-direction.md`.
