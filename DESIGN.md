@@ -1,6 +1,6 @@
 # Physic Learn visual system
 
-Soft Academic / Scientific Minimalism: an off-white learning workspace with measured teal accents, legible Thai typography, subtle borders and restrained elevation. The existing six dashboard sections, navigation hierarchy, curriculum, data and learning flows are retained.
+Scientific Minimalism / Academic Laboratory Notebook: flat off-white surfaces, measured teal accents, readable Thai typography and subtle borders. No decorative elevation or animation. The existing six dashboard sections, navigation hierarchy, curriculum, data and learning flows are retained.
 
 ## Shared design tokens
 
@@ -8,22 +8,23 @@ Soft Academic / Scientific Minimalism: an off-white learning workspace with meas
 
 | Role | Value |
 | --- | --- |
-| Canvas | `#f6f8f5` |
-| Surface | `#ffffff` |
-| Sidebar | `#fbfcf9` |
-| Featured lesson | `#edf6f2` |
-| Primary text | `#233c37` |
-| Secondary text | `#566b63` |
-| Teal action / focus | `#086b61` |
-| Teal hover | `#07584f` |
-| Teal selection tint | `#e0f0e9` |
-| Border | `#dce5dd` |
+| Canvas | `#f5f5f0` |
+| Surface | `#fdfdfa` |
+| Sidebar | `#fdfdfa` |
+| Featured lesson | `#edeee9` |
+| Primary text | `#263b3d` |
+| Secondary text | `#596764` |
+| Teal action / focus | `#087f8c` |
+| Teal small text on tonal surfaces | `#066974` |
+| Teal hover | `#066974` |
+| Teal selection tint | `#e4eff0` |
+| Border | `#d9ded7` |
 | Completion text | `#27654a` |
 | Font | Self-hosted IBM Plex Sans Thai, 400/500/600/700 |
 | Spacing | 4, 8, 12, 16, 20, 24, 32, 40, 48, 64px |
 | Type | 13, 14, 16, 18, 22px plus fluid headings |
 | Radius | 8px controls; 12–16px panels; 20px available for larger surfaces |
-| Elevation | Small neutral shadows; no glow, glass, gradients or decorative animation |
+| Elevation | None; flat tonal panels without glow, glass, gradients or decorative animation |
 | Transition | 160ms for color, border and subtle elevation; zero with reduced motion |
 
 ## Composition
@@ -44,9 +45,17 @@ Below 700px, the existing mobile navigation behavior is retained: closed navigat
 - The main region is programmatically focusable for the skip link.
 - Reduced-motion preferences disable transitions.
 
+## Adaptive learning additions
+
+Difficulty and goal are independently editable through an inline form with clear draft, saving, failure and conflict feedback. New learners are offered optional onboarding; existing activity suppresses it. Dashboard progress and next actions come from saved stages and attempts. Review cards explain submitted evidence and offer lesson, practice and historical-answer actions.
+
+Canonical lessons remain visible at every level. Only the first wave stage has authored extensions: variable definitions, guided calculations, checkpoints, explicit assumptions and a static parameter-driven predict → experiment → observe → explain → apply lab. Other stages label their canonical fallback. Formative practice is clearly distinguished from formal tests.
+
+The original secondary color `#667371` is retained as a caption token; the small body-text token is darkened to `#596764` for contrast on tonal panels. The primary accent is `#087f8c`. Reusable form, checkpoint, review and lab surfaces live in `app/adaptive.css` and use shared tokens.
+
 ## Preserved functionality
 
-No route, API, database, question engine, curriculum, grading, persistence, synchronization or authentication changes. The existing component framework and physics calculations remain in use. The graph's axis-label position was adjusted solely to keep text clear of plotted data.
+All query routes, 20 stages, 70 source mappings, games, question generation, grading, immutable historical solutions and authentication remain. Preferences add a user-scoped revisioned table/API; review aggregates submitted snapshots without altering them. Canonical progress IDs do not depend on difficulty. See `docs/adaptive-learning.md` for the architecture and migration.
 
 ## Verification
 

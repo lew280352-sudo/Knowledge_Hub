@@ -115,5 +115,5 @@ test('review uses only latest submitted concept evidence, includes combined exam
  await store.submitAttempt('alice',active.id,0);const blank=await store.readReview('alice');assert.equal(blank.find(r=>r.sourceId===qs[0].sourceId)?.incorrectCount,0);assert.ok(blank.every(r=>r.unansweredCount>0));
  tick(1000);const recovery=await store.createAttempt('alice',{chapter:'waves',count:70});const raw=sqlite.prepare('SELECT questions FROM exam_attempts WHERE id=?').get(recovery.id) as {questions:string};const correct=Object.fromEntries(JSON.parse(raw.questions).map((q:any)=>[q.id,q.answer]));
  const repaired=await store.updateAttempt('alice',recovery.id,{revision:0,answers:correct,currentIndex:0,eventId:'review-recovery'});await store.submitAttempt('alice',recovery.id,repaired.revision);
- assert.deepEqual(await store.readReview('alice'),[]);assert.equal((await store.getAttempt('alice',a.id)).score,saved.questions.length?93:0);
+ assert.deepEqual(await store.readReview('alice'),[]);assert.equal((await store.getAttempt('alice',a.id)).score,93);
 });

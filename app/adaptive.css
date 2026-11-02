@@ -9,7 +9,7 @@
 .variable-table thead{background:var(--panel)}
 .worked-example{border:1px solid var(--line);border-radius:var(--radius-sm);padding:var(--space-4);margin:var(--space-5) 0;font-size:var(--text-sm)}
 summary{cursor:pointer;min-height:44px;padding:8px 0}
-summary:focus-visible,textarea:focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
+summary:focus-visible,textarea:focus-visible,.math-formula:focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
 .concept-checkpoint,.wave-lab{background:var(--panel);padding:var(--space-5);border:1px solid var(--line);border-radius:var(--radius-md);margin:var(--space-6) 0}
 .concept-checkpoint fieldset,.wave-lab fieldset{border:0;padding:0;margin:var(--space-4) 0;min-width:0}
 .concept-checkpoint legend,.wave-lab legend{font-weight:500;margin-bottom:var(--space-3);font-size:var(--text-base)}
@@ -36,3 +36,4 @@ summary:focus-visible,textarea:focus-visible{outline:3px solid var(--color-focus
 .review-footer{flex-wrap:wrap}
 .practice-review{padding:var(--space-4);border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:var(--space-5);background:var(--surface);font-size:var(--text-sm)}
 .review-card h3{overflow-wrap:anywhere}
+@media(max-width:700px){.wave-lab .math-formula{font-size:14px}}

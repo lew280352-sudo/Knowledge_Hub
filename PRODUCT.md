@@ -3,18 +3,18 @@
 ## Platform
 web
 ## Stack
-Delegated in the approved design: Sites Vinext/React/TypeScript, D1 and ChatGPT identity.
+Existing Sites Vinext/React/TypeScript, D1 and ChatGPT identity.
 ## Users
-One Thai-speaking learner revising the supplied physics final-exam PDF on phone, tablet and desktop.
+Thai-speaking learners with different foundations, using one private account across phone, tablet and desktop. Difficulty represents learning depth, not age.
 ## Product Purpose
-Understand wave, wave-optics, ray-optics and sound problems, then practice new parameter variants and retain exact historical solutions.
+Understand wave, wave-optics, ray-optics and sound concepts, practice new parameter variants, and retain exact historical solutions. Independently choose foundation/standard/advanced teaching and conceptual understanding/exam preparation/problem-solving goals.
 ## Operating Context
-20 stages, 70 mapped source questions, paced lessons, interactive diagrams, matching games, end-stage tests and combined exams. Resume the same account across devices.
+20 canonical stages, 70 mapped source questions, paced lessons, interactive diagrams, matching games, stage tests and combined exams. Resume the same account across devices. First wave lesson has verified representative extensions at three levels; all other stages retain canonical teaching.
 ## Capabilities and Constraints
-Private owner access; real server persistence; 80% stage threshold; default 5-question stage test and 20-question untimed combined test; no runtime AI. See approved specification for concurrency and answer visibility.
+Private owner access; authenticated server persistence; 80% stage threshold; default 5-question stage test and 20-question untimed combined test; immutable submitted snapshots; no runtime AI. Additive versioned preferences preserve progress. Review uses the latest submitted evidence per source concept, never page views or time spent. Lab free text is temporary, explicitly ungraded and not synced.
 ## Evidence on Hand
-58-page source PDF in the repository. No official answer-key section; all worked solutions require independent verification. No testimonials or fabricated learning statistics.
+58-page user-supplied source PDF. No official answer-key section; worked solutions require independent verification. No fabricated learning statistics or mastery claims.
 ## Product Principles
-Explain why before calculation. Use diagrams that agree with parameters. Preserve saved attempts exactly. Show synchronization state truthfully.
+Explain why before calculation. Predict, experiment, observe, explain and apply. Keep diagrams consistent with parameters and boundary conditions. Preserve saved attempts exactly. Report synchronization truthfully and recover from mistakes without punishment or competitive mechanics.
 ## Accessibility & Inclusion
-Thai text, readable equations, keyboard/touch interactions, reduced motion, responsive layout without drag-only tasks.
+Self-hosted IBM Plex Sans Thai, readable equations/MathML, keyboard/touch controls, labelled progress, mobile focus management, reduced motion, responsive layout. WCAG 2.2 AA is the target; automated checks alone are not a certification.

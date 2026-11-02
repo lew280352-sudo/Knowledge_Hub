@@ -37,20 +37,20 @@ button svg,a svg{flex-shrink:0}
 .skip-link:focus{top:10px}
 .back-link{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;min-height:40px;padding:0;margin-bottom:24px}
 .stage-heading{display:flex;gap:18px;align-items:center;margin-bottom:29px}
-.large-stage-number{font-size:44px;font-weight:400;letter-spacing:-.04em;color:#9aa79e;line-height:1}
+.large-stage-number{font-size:44px;font-weight:400;letter-spacing:-.04em;color:var(--muted);line-height:1}
 .stage-heading h1{font-size:30px}
 .stage-heading p{margin-top:8px;color:var(--muted);font-size:14px}
 .stage-heading>.result-tag{margin-left:auto}
 .mode-tabs{display:flex;gap:25px;border-bottom:1px solid var(--line);margin-bottom:34px}
 .mode-tabs button{display:flex;align-items:center;justify-content:center;gap:9px;padding:14px 0;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;min-height:52px}
-.mode-tabs button.active{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
+.mode-tabs button.active{color:var(--ink);border-bottom-color:var(--color-accent-text);font-weight:500}
 .lesson-grid{display:grid;grid-template-columns:210px minmax(0,1fr);gap:32px;align-items:start}
 .lesson-outline{position:sticky;top:24px}
 .lesson-outline>.muted{font-size:12px;margin-bottom:17px}
 .step-link{display:flex;gap:10px;width:100%;font-size:12px;line-height:1.7;text-align:left;padding:11px 7px;color:var(--muted);min-height:54px;border-radius:6px}
 .step-link>span{display:grid;place-items:center;flex-shrink:0;width:23px;height:23px;border:1px solid var(--line);border-radius:50%;font-size:10px;margin-top:1px}
 .step-link.active{background:#e9ece4;color:var(--ink)}
-.step-link.active>span{border-color:var(--accent);color:var(--accent)}
+.step-link.active>span{border-color:var(--color-accent-text);color:var(--accent)}
 .source-link{display:inline-flex;gap:6px;align-items:center;font-size:11px;line-height:1.7;color:var(--muted);min-height:36px}
 .lesson-outline>.source-link{margin-top:25px;flex-wrap:wrap}
 .lesson-content{min-width:0;background:var(--surface);padding:26px;border:1px solid var(--line);border-radius:var(--radius)}
@@ -65,7 +65,7 @@ button svg,a svg{flex-shrink:0}
 .figure-caption{display:block;margin-bottom:4px;font-size:11px}
 .diagram-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:18px;padding:17px 18px 14px;border-top:1px solid var(--line)}
 .diagram-controls label{font-size:11px;display:block}
-.diagram-controls output{display:block;color:var(--accent);font-weight:500;margin-top:3px;font-variant-numeric:tabular-nums}
+.diagram-controls output{display:block;color:var(--color-accent-text);font-weight:500;margin-top:3px;font-variant-numeric:tabular-nums}
 .diagram-controls input{width:100%;height:26px;accent-color:var(--accent)}
 .note{background:#f5f0e7;padding:16px 18px;border-radius:8px;margin:20px 0;font-size:13px}
 .note strong{font-weight:500;color:#78502e}
@@ -95,7 +95,7 @@ button svg,a svg{flex-shrink:0}
 .setup-fields label{font-size:12px}
 .setup-fields select{display:block;width:100%;min-height:45px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);padding:8px 12px;margin-top:8px}
 .setup-note{background:var(--panel);border-radius:10px;padding:25px;font-size:13px}
-.setup-note>svg{color:var(--accent);margin-bottom:15px}
+.setup-note>svg{color:var(--color-accent-text);margin-bottom:15px}
 .setup-note h3{font-size:18px}
 .setup-note ul{padding-left:18px;margin:14px 0 0}
 .setup-note li{margin-bottom:10px;line-height:1.8}
@@ -122,7 +122,7 @@ button svg,a svg{flex-shrink:0}
 .answer-choice{display:flex;align-items:center;gap:14px;min-height:65px;padding:13px 17px;text-align:left;border:1px solid var(--line);border-radius:9px;background:#f7f8f3}
 .answer-choice>span{display:grid;place-items:center;border:1px solid #c9d2c9;width:29px;height:29px;flex-shrink:0;border-radius:50%;font-size:12px;color:var(--muted)}
 .answer-choice strong{font-size:14px;font-weight:400}
-.answer-choice>svg{margin-left:auto;color:var(--accent);flex-shrink:0}
+.answer-choice>svg{margin-left:auto;color:var(--color-accent-text);flex-shrink:0}
 .answer-choice.selected{border:2px solid var(--accent);padding:12px 16px;background:#eaf2ed}
 .answer-choice:hover:not(:disabled){background:#edf2e9}
 .question-controls{display:flex;justify-content:space-between;gap:12px;margin-top:30px}
@@ -132,7 +132,7 @@ button svg,a svg{flex-shrink:0}
 .exam-submit>p:not(.muted){font-size:13px;margin-bottom:15px}
 .result-summary{display:grid;grid-template-columns:200px 1fr;gap:30px;align-items:center;background:var(--panel);padding:32px;border-radius:var(--radius);margin:30px 0 35px}
 .result-summary>div:first-child{border-right:1px solid var(--line);padding-right:25px}
-.result-summary strong{font-size:58px;line-height:1.1;font-weight:400;letter-spacing:-.04em;color:var(--accent);font-variant-numeric:tabular-nums}
+.result-summary strong{font-size:58px;line-height:1.1;font-weight:400;letter-spacing:-.04em;color:var(--color-accent-text);font-variant-numeric:tabular-nums}
 .result-summary strong small{font-size:25px}
 .result-summary p{color:var(--muted);font-size:13px;margin-top:12px}
 .result-summary .button{margin-top:20px}
