@@ -1,0 +1,14 @@
+export type ChapterId = 'waves' | 'wave-optics' | 'ray-optics' | 'sound';
+export type DiagramKind = 'wave' | 'superposition' | 'reflection' | 'refraction' | 'interference' | 'slits' | 'lens' | 'colors' | 'sound' | 'resonance' | 'doppler' | 'shock';
+export type Diagram = { kind: DiagramKind; values: Record<string,number>; caption?: string };
+export type LessonStep = { title:string; body:string; formula?:string; note?:string };
+export type MatchPair = { left:string; right:string };
+export type Stage = { id:string; number:number; chapter:ChapterId; title:string; description:string; formula:string; diagram:DiagramKind; minutes:number; steps:LessonStep[]; pairs:MatchPair[]; sourcePages:number[] };
+export type SourceQuestion = { id:string; chapter:ChapterId; number:number; page:number; stageId:string; topic:string };
+export type PublicQuestion = { id:string; sourceId:string; stageId:string; page:number; prompt:string; choices:string[]; diagram?:Diagram };
+export type QuestionSnapshot = PublicQuestion & { answer:string; numericAnswer?:number; explanation:string[]; formula:string; templateVersion:number };
+export type Attempt = { id:string; stageId:string|null; chapter:ChapterId|null; status:'active'|'submitted'; revision:number; createdAt:string; submittedAt:string|null; deadline:string|null; currentIndex:number; answers:Record<string,string>; questions:PublicQuestion[]; score?:number; correctCount?:number };
+export type ReviewedAttempt = Omit<Attempt,'questions'> & { questions:QuestionSnapshot[] };
+export type Progress = { stageId:string; step:number; completed:number[]; updatedAt:string; revision:number };
+export type AttemptSummary = Omit<Attempt,'questions'|'answers'> & { questionCount:number; answeredCount:number };
+export type LearningState = { lessons:Progress[]; attempts:AttemptSummary[]; games:{id:string; stageId:string; correct:number; total:number; createdAt:string}[]; displayName:string };
