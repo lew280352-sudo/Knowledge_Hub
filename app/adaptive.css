@@ -51,3 +51,11 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:1}
 
 .concept-checkpoint .reasoning-field{display:block;cursor:default}
 .concept-checkpoint .reasoning-field .muted{display:block;margin-top:var(--space-2)}
+
+.lab-notebook-status{margin:var(--space-5) 0;padding-top:var(--space-4);border-top:1px solid var(--line);font-size:var(--text-sm);line-height:1.95}
+.lab-notebook-status h4{margin-top:0}
+.lab-notebook-status .button-row{gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-4)}
+.notebook-comparison{margin:var(--space-4) 0}
+.notebook-comparison h5{font-size:var(--text-sm)}
+.notebook-latest{max-height:18rem;overflow:auto;background:var(--surface);padding:var(--space-4);border:1px solid var(--line);border-radius:var(--radius-sm);white-space:pre-wrap;overflow-wrap:anywhere}
+.reasoning-field textarea:disabled{opacity:.7;cursor:wait}

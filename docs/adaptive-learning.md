@@ -18,7 +18,7 @@ V3 extends those boundaries rather than replacing the application. `lib/curricul
 
 ## Meaningful difficulty differences
 
-Foundation explains terms, quantities/units and physical meaning before guided substitution. Standard combines relationships and multi-step worked examples with independent conceptual questions. Advanced examines assumptions, limits, signs, competing models and physical feasibility. It requires a temporary written reason before checking a conceptual choice; that writing is **not** automatically graded.
+Foundation explains terms, quantities/units and physical meaning before guided substitution. Standard combines relationships and multi-step worked examples with independent conceptual questions. Advanced examines assumptions, limits, signs, competing models and physical feasibility. It requires a temporary written reason before checking a conceptual choice; that checkpoint writing is **not** automatically graded or saved. Lab step-4 explanations use the separate notebook save described below.
 
 All levels retain canonical lesson text. Supplementary content follows existing step IDs: concept/glossary/assumptions, worked example, misconception or transfer/checkpoint, then synthesis where the canonical stage has a fourth step. Examples use a disclosure so learners can attempt first. A stable rotation changes checkpoint presentation order while preserving authored answer indices. No runtime AI or probabilistic mastery estimator is used.
 
@@ -30,7 +30,7 @@ Preferences remain independent of progress. Changing level neither creates a new
 
 `lib/physics-models.ts` supplies deterministic relationships used by SVG readouts and tests. Snell rejects nonexistent refracted angles. Optics skips f = 0 and treats u = f as an image at infinity. Integer mode/order controls snap fractional numeric input. Slit width stays below center separation; single/double/combined patterns use the appropriate sinc²/cos² models. Grating directions use actual angular geometry. Doppler remains subsonic; Mach geometry remains strictly supersonic. Captions state when a picture is schematic, rescaled, paraxial, far-field or small-angle.
 
-There is no autoplay. Controls retain native keyboard interaction and labelled values/units. Textual relationships supplement SVGs. Predictions and written reasons are temporary and ungraded; the UI explicitly states that these fields do not sync across devices. Saved canonical progress and preferences continue to sync through D1.
+There is no autoplay. Controls retain native keyboard interaction and labelled values/units. Textual relationships supplement SVGs. Lab predictions and step-4 explanations are ungraded and can be saved explicitly to the account through D1. Notebook revisions are shared across difficulties for the same canonical stage. Scoped device drafts recover unsuccessful writes after authenticated loading; stale devices must compare account and draft text before choosing a version. Advanced checkpoint reasoning remains temporary and unsynced. Saved canonical progress and preferences continue to sync independently. See [lab notebook](lab-notebook.md).
 
 ## Smart Review evidence policy
 
@@ -51,10 +51,10 @@ Server review still reads only submitted snapshots, selecting the latest coverin
 
 ## Data integrity and release boundaries
 
-V3 adds no table or migration. The prior additive preference migration remains compatible with original lesson/exam data. Existing user-scoped same-origin APIs, answer revision/event deduplication, deadlines, server grading, answer protection, offline drafts and conflict recovery are retained. Active formal questions still omit answers, formulas and worked explanations; pedagogical hints remain inside formative components. Historical snapshots are never rewritten.
+The V3 curriculum release added no table or migration. The notebook follow-up appends `0002_flaky_micromacro.sql`, a separate `lab_notebooks` table keyed by user and stage, without altering existing tables or rows. The prior additive preference migration remains compatible with original lesson/exam data. Existing user-scoped same-origin APIs, answer revision/event deduplication, deadlines, server grading, answer protection, offline drafts and conflict recovery are retained. Active formal questions still omit answers, formulas and worked explanations; pedagogical hints remain inside formative components. Historical snapshots are never rewritten.
 
 The Site keeps its existing project ID and owner-private audience. CI uses a fresh local D1 and local verified mock identity, with no production token or private account data. It runs TypeScript, Node tests, production build and Playwright. Hosted Actions results must be distinguished from locally executed commands.
 
 ## Educational follow-up
 
-A physics educator can independently review Thai explanations and classroom suitability; this release's source/calculation checks are not an external expert endorsement. Future diagnostic questions should collect explicit reasoning evidence before enabling automatic cause classification. Optional reason storage would need an explicit additive data design. A calibrated two-lens lab or real-spectrum color experiment can be considered if it improves learning beyond the current static s15 material. Outcome studies are needed before any mastery score or automatic level assignment is justified.
+A physics educator can independently review Thai explanations and classroom suitability; this release's source/calculation checks are not an external expert endorsement. Future diagnostic questions should collect explicit reasoning evidence before enabling automatic cause classification. Optional checkpoint-reason storage would need a separate data design; current notebook storage covers prediction and lab step 4 only. A calibrated two-lens lab or real-spectrum color experiment can be considered if it improves learning beyond the current static s15 material. Outcome studies are needed before any mastery score or automatic level assignment is justified.
