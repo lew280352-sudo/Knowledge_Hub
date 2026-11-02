@@ -11,6 +11,7 @@
 - 70 แม่แบบอิงแนวโจทย์ในเอกสาร สุ่มตัวเลขและตัวเลือกใหม่ พร้อมคำนวณเฉลยตามค่าของชุดนั้น
 - เลือกบท จำนวนข้อ และการจับเวลาได้ เกณฑ์ผ่านด่าน 80%
 - เก็บคำตอบ ตัวเลขโจทย์ คะแนนและเฉลยย้อนหลัง ข้อสอบที่ยังไม่ส่งไม่เปิดเฉลย
+- คำทำนายและเหตุผลข้อ 4 ในห้องทดลองบันทึกแยกตามด่าน เปิดต่อข้ามอุปกรณ์ได้ด้วยปุ่มบันทึกห้องทดลอง
 - ซิงก์ผ่าน Cloudflare D1; มีร่างในเครื่องเมื่อบันทึกล้มเหลวและแจ้งเมื่อข้อมูลชนกับอีกอุปกรณ์
 
 เฉลยเป็นคำอธิบายที่จัดทำและตรวจใหม่ ไม่ใช่ชุดเฉลยทางการจากผู้จัดทำ PDF ข้อที่มีเงื่อนไขกำกวมถูกดัดแปลงให้ชัดเจน ดู [ทะเบียนเนื้อหา](docs/content-inventory.md)
@@ -24,6 +25,7 @@ npm ci
 npm run build
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_exotic_lightspeed.sql
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_curious_trish_tilby.sql
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0002_flaky_micromacro.sql
 npm run dev -- --port 5173
 ```
 
@@ -68,5 +70,6 @@ GitHub Actions ตรวจ TypeScript, unit/integration, production build แ�
 - [ทะเบียนโจทย์ 70 ข้อ](docs/content-inventory.md)
 - [ทิศทางภาพและ asset provenance](docs/design-direction.md)
 - [บันทึกการตรวจสอบ](docs/verification.md)
+- [การบันทึกสมุดทดลองและการกู้คืนร่าง](docs/lab-notebook.md)
 
 ใช้ Superpowers, design-taste-frontend, Impeccable, Lucide / Simple Icons และ Playwright ตาม brief ฟอนต์ IBM Plex Sans Thai อยู่ภายใต้ OFL ดู `public/fonts/OFL.txt` ไอคอน GitHub มาจาก Simple Icons; ภาพฟิสิกส์เป็น SVG ที่วาดจากค่าจริง

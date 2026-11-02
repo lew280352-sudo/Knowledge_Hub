@@ -129,3 +129,30 @@ test('all 20 canonical progress records and submitted snapshots survive every di
   assert.deepEqual(sqlite.prepare('SELECT * FROM exam_attempts WHERE id=?').get(exam.id),raw);
  }
 });
+
+test('notebooks isolate account and stage, detect conflicting devices and recover a lost success response idempotently',async()=>{
+ const {store}=setup();const first=await store.readNotebook('alice','s13');assert.equal(first.revision,0);assert.equal(first.updatedAt,null);
+ const a=await store.saveNotebook('alice',{stageId:'s13',prediction:'ภาพเสมือน',reason:'u < f จึงได้ v < 0',revision:0});assert.equal(a.revision,1);
+ assert.deepEqual(await store.saveNotebook('alice',{...a,revision:0}),a); // response loss, no duplicate write
+ await assert.rejects(()=>store.saveNotebook('alice',{...a,reason:'ร่างจากเครื่องเก่า',revision:0}),/conflict/);
+ assert.deepEqual(await store.readNotebook('alice','s13'),a);assert.equal((await store.readNotebook('bob','s13')).reason,'');assert.equal((await store.readNotebook('alice','s14')).revision,0);
+ const next=await store.saveNotebook('alice',{...a,reason:'แก้หลังเปรียบเทียบแล้ว'});assert.equal(next.revision,2);
+ const cleared=await store.saveNotebook('alice',{...next,prediction:'',reason:''});assert.equal(cleared.revision,3);assert.equal((await store.readNotebook('alice','s13')).reason,'');
+});
+test('notebook inputs reject unsupported stages, bad text, oversized content and invalid versions',async()=>{
+ const {store}=setup(),note={stageId:'s13',prediction:'',reason:'',revision:0};
+ for(const input of [{...note,stageId:'s15'},{...note,stageId:'invalid'},{...note,reason:'x'.repeat(4001)},{...note,prediction:123},{...note,revision:-1},{...note,revision:1.5},{...note,stageId:'s01',prediction:'not a prediction choice'}])await assert.rejects(()=>store.saveNotebook('alice',input as any),/invalid/);
+ await assert.rejects(()=>store.readNotebook('','s13'),/unauthorized/);await assert.rejects(()=>store.readNotebook('alice','s15'),/invalid/);
+ await assert.rejects(()=>store.saveNotebook('',note),/unauthorized/);
+ assert.equal((await store.saveNotebook('alice',{...note,stageId:'s01',prediction:'สั้นลง'})).prediction,'สั้นลง');
+});
+test('adding notebook storage preserves every original row, preference and exact submitted snapshot',()=>{
+ const sqlite=new DatabaseSync(':memory:');for(const file of readdirSync('drizzle').filter(f=>f.endsWith('.sql')&&!f.startsWith('0002')))sqlite.exec(readFileSync(`drizzle/${file}`,'utf8'));
+ sqlite.prepare('INSERT INTO lesson_progress VALUES (?,?,?,?,?,?)').run('legacy','s13',2,'[0,1]',5,'2026-01-01');
+ sqlite.prepare('INSERT INTO learner_preferences VALUES (?,?,?,?,?,?)').run('legacy','advanced','exam-prep',1,4,'2026-01-01');
+ sqlite.prepare('INSERT INTO game_runs VALUES (?,?,?,?,?,?)').run('old-game','legacy','s13',4,5,'2026-01-01');
+ sqlite.prepare("INSERT INTO exam_attempts (id,user_id,status,revision,questions,answers,current_index,created_at) VALUES (?,?,'submitted',1,?,?,0,?)").run('old-exam','legacy','[{"answer":"exact","formula":"saved"}]','{"old":"exact"}','2026-01-01');
+ const tables=['lesson_progress','learner_preferences','game_runs','exam_attempts'],before=tables.map(t=>sqlite.prepare(`SELECT * FROM ${t}`).all());
+ for(const file of readdirSync('drizzle').filter(f=>f.startsWith('0002')&&f.endsWith('.sql')))sqlite.exec(readFileSync(`drizzle/${file}`,'utf8'));
+ assert.deepEqual(tables.map(t=>sqlite.prepare(`SELECT * FROM ${t}`).all()),before);assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM lab_notebooks').get()?.n,0);sqlite.close();
+});

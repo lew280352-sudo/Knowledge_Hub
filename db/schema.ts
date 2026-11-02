@@ -11,3 +11,6 @@ export const attempts=sqliteTable('exam_attempts',{
 export const learnerPreferences=sqliteTable('learner_preferences',{
  userId:text('user_id').primaryKey().notNull(),difficulty:text('difficulty').notNull(),goal:text('goal').notNull(),onboardingCompleted:integer('onboarding_completed').notNull(),revision:integer('revision').notNull(),updatedAt:text('updated_at').notNull(),
 });
+export const labNotebooks=sqliteTable('lab_notebooks',{
+ userId:text('user_id').notNull(),stageId:text('stage_id').notNull(),prediction:text('prediction').notNull(),reason:text('reason').notNull(),revision:integer('revision').notNull(),updatedAt:text('updated_at').notNull(),
+},t=>[primaryKey({columns:[t.userId,t.stageId]})]);

@@ -1,4 +1,5 @@
 import { stages, sourceQuestions, chapters, getStage } from '../curriculum.ts';
+import {isNotebookStage,sameLabText,validLabText,type LabNotebook,type NotebookDraft} from '../notebook.ts';
 import {deriveReview} from '../review.ts';
 import {defaultPreferences,difficultyOptions,goalOptions} from '../learning.ts';
 import { generateQuestion, publicQuestion } from '../questions.ts';
@@ -44,6 +45,26 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
    :await run('UPDATE learner_preferences SET difficulty=?,goal=?,onboarding_completed=1,revision=?,updated_at=? WHERE user_id=? AND revision=?',input.difficulty,input.goal,revision,updatedAt,user,input.revision);
   if(!result.meta?.changes)throw new StoreError('conflict',409);
   return {difficulty:input.difficulty,goal:input.goal,onboardingCompleted:true,revision,updatedAt};
+ }
+ async function readNotebook(user:string,stageId:string):Promise<LabNotebook>{
+  identity(user);invalid(typeof stageId==='string'&&isNotebookStage(stageId));
+  const row=await first('SELECT * FROM lab_notebooks WHERE user_id=? AND stage_id=?',user,stageId);
+  return row?{stageId,prediction:row.prediction,reason:row.reason,revision:row.revision,updatedAt:row.updated_at}:{stageId,prediction:'',reason:'',revision:0,updatedAt:null};
+ }
+ async function saveNotebook(user:string,input:NotebookDraft&{stageId:string}):Promise<LabNotebook>{
+  identity(user);invalid(validLabText(input)&&typeof input.stageId==='string'&&isNotebookStage(input.stageId)&&Number.isSafeInteger(input.revision)&&input.revision>=0&&input.revision<Number.MAX_SAFE_INTEGER);
+  invalid(input.stageId!=='s01'||['','ยาวขึ้น','สั้นลง','เท่าเดิม'].includes(input.prediction));
+  const revision=input.revision+1,updatedAt=now();
+  const result=input.revision===0
+   ?await run('INSERT INTO lab_notebooks (user_id,stage_id,prediction,reason,revision,updated_at) VALUES (?,?,?,?,?,?) ON CONFLICT(user_id,stage_id) DO NOTHING',user,input.stageId,input.prediction,input.reason,revision,updatedAt)
+   :await run('UPDATE lab_notebooks SET prediction=?,reason=?,revision=?,updated_at=? WHERE user_id=? AND stage_id=? AND revision=?',input.prediction,input.reason,revision,updatedAt,user,input.stageId,input.revision);
+  if(!result.meta?.changes){
+   const latest=await readNotebook(user,input.stageId);
+   // A lost success response can be retried safely without a second write.
+   if(latest.revision>0&&sameLabText(latest,input))return latest;
+   throw new StoreError('conflict',409);
+  }
+  return {stageId:input.stageId,prediction:input.prediction,reason:input.reason,revision,updatedAt};
  }
  async function readReview(user:string){
   identity(user);
@@ -112,5 +133,5 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
   if(!r.meta?.changes)throw new StoreError('conflict',409);return toAttempt(await rowFor(user,id));
  }
  async function submitAttempt(user:string,id:string,revision:number){invalid(Number.isInteger(revision)&&revision>=0);const row=await rowFor(user,id);return submitRow(row,revision,!!row.deadline&&row.deadline<=now());}
- return {readState,readReview,readPreferences,savePreferences,saveLesson,saveGame,createAttempt,getAttempt,updateAttempt,submitAttempt};
+ return {readNotebook,saveNotebook,readState,readReview,readPreferences,savePreferences,saveLesson,saveGame,createAttempt,getAttempt,updateAttempt,submitAttempt};
 }
