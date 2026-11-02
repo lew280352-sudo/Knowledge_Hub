@@ -39,3 +39,12 @@ summary:focus-visible,textarea:focus-visible,.math-formula:focus-visible{outline
 @media(max-width:700px){.wave-lab .math-formula{font-size:14px}}
 /* Explicit contrast instead of the browser/framework's translucent placeholder. */
 textarea::placeholder,input::placeholder{color:var(--muted);opacity:1}
+
+.review-focus{display:grid;gap:8px;max-width:440px;margin-top:16px;font-size:14px;font-weight:500}
+.review-focus select{width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit}
+.review-classification,.review-guidance{font-size:14px;line-height:1.9;margin-top:12px}
+.checkpoint-hint{margin:16px 0;font-size:14px;line-height:1.9}
+.checkpoint-hint summary{cursor:pointer;min-height:44px;align-content:center;color:var(--accent-text);font-weight:500}
+.checkpoint-hint p,.checkpoint-result>p{margin:10px 0;line-height:1.9}
+.checkpoint-result .button-row{gap:16px;flex-wrap:wrap}
+#lesson-explanation{scroll-margin-top:24px}

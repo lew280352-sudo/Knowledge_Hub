@@ -1,3 +1,4 @@
+import {classifyReviewEvidence} from './concepts.ts';
 import {sourceQuestions} from './curriculum.ts';
 import type {ReviewRecommendation} from './question-types.ts';
 /** Rows are server-only submitted snapshots from the latest attempt for each source. */
@@ -11,5 +12,5 @@ export function deriveReview(rows:ReviewEvidence[]):ReviewRecommendation[]{
   const answer=(JSON.parse(row.answers) as Record<string,string>)[row.question_id];item.questionCount++;
   if(answer===undefined)item.unansweredCount++;else if(answer!==row.expected)item.incorrectCount++;
  }
- return [...concepts.values()].filter(c=>c.incorrectCount+c.unansweredCount>0).sort((a,b)=>b.reviewedAt.localeCompare(a.reviewedAt)||b.incorrectCount-a.incorrectCount||a.sourceId.localeCompare(b.sourceId));
+ return [...concepts.values()].filter(c=>c.incorrectCount+c.unansweredCount>0).map(c=>({...c,...classifyReviewEvidence(c.incorrectCount,c.unansweredCount)})).sort((a,b)=>b.reviewedAt.localeCompare(a.reviewedAt)||b.incorrectCount-a.incorrectCount||a.sourceId.localeCompare(b.sourceId));
 }
