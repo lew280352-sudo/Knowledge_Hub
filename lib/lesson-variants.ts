@@ -1,3 +1,4 @@
+import {expandedVariant} from './teaching-content.ts';
 import type {Difficulty,DifficultyVariant,LessonExtension} from './question-types.ts';
 // Authored additions only: the canonical curriculum and its step IDs remain immutable.
 export const firstWaveVariants:Record<Difficulty,DifficultyVariant>={
@@ -20,4 +21,6 @@ export const firstWaveVariants:Record<Difficulty,DifficultyVariant>={
   3:{intro:'สำหรับคลื่นเคลื่อนไปทาง +x ที่มีเฟส kx − ωt ให้ λ = 2 m, f = 2 Hz เปรียบเทียบเหตุการณ์ที่ Δx = +0.75 m และ Δt = +0.125 s',example:{prompt:'หาผลต่างเฟสแบบมีเครื่องหมาย',steps:['kΔx = (2π/2)(0.75) = 0.75π rad = 135°','ωΔt = 2π(2)(0.125) = 0.5π rad = 90°','Δφ = kΔx − ωΔt = 45° ไม่ใช่ 135° เพราะเวลาเปลี่ยนด้วย'],formula:'\\Delta\\phi=k\\Delta x-\\omega\\Delta t=\\pi/4'},checkpoint:{prompt:'จุดเดิมเมื่อเวลาผ่านไปหนึ่งคาบมีเฟสต่างจากเดิมเท่าไร modulo 360°?',choices:['0°','180°','90°'],answer:0,explanation:'เฟสลดลง 360° ซึ่งเทียบเท่า 0° modulo หนึ่งรอบ จุดกลับมาจังหวะเดิม'}},
  }},
 };
-export function getLessonExtension(stageId:string,difficulty:Difficulty,step:number):LessonExtension|undefined{return stageId==='s01'?firstWaveVariants[difficulty].steps[step]:undefined;}
+export function getLessonExtension(stageId:string,difficulty:Difficulty,step:number):LessonExtension|undefined{return (stageId==='s01'?firstWaveVariants[difficulty]:expandedVariant(stageId,difficulty))?.steps[step];}
+
+export function hasLessonVariants(stageId:string){return stageId==='s01'||!!expandedVariant(stageId,'standard');}

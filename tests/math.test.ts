@@ -4,12 +4,14 @@ import {readFileSync} from 'node:fs';
 import katex from 'katex';
 import {stages,sourceQuestions} from '../lib/curriculum.ts';
 import {generateQuestion} from '../lib/questions.ts';
+import {teachingContent} from '../lib/teaching-content.ts';
 import {firstWaveVariants} from '../lib/lesson-variants.ts';
 import {normalizeFormula} from '../lib/math-format.ts';
 function render(formula:string){return katex.renderToString(formula,{throwOnError:true,strict:'ignore',trust:false,output:'htmlAndMathml'});}
 test('all canonical, variant and generated solution formulas parse without bare spacing commands',()=>{
  const formulas=stages.flatMap(s=>[s.formula,...s.steps.flatMap(p=>p.formula?[p.formula]:[])]);
  for(const variant of Object.values(firstWaveVariants))for(const step of Object.values(variant.steps))if(step?.example)formulas.push(step.example.formula);
+ for(const content of Object.values(teachingContent))for(const level of [content.foundation,content.standard,content.advanced])formulas.push(level.example.formula);
  for(const source of sourceQuestions)for(const seed of [0,19,2026])formulas.push(generateQuestion(source.id,seed).formula);
  for(const formula of formulas){
   assert.doesNotThrow(()=>render(formula),formula);

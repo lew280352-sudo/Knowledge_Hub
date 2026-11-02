@@ -18,6 +18,8 @@ export type Difficulty = 'foundation' | 'standard' | 'advanced';
 export type LearningGoal = 'understanding' | 'exam-prep' | 'problem-solving';
 export type LearningPreferences = {difficulty:Difficulty;goal:LearningGoal;onboardingCompleted:boolean;revision:number;updatedAt:string|null};
 export type ReviewRecommendation = {sourceId:string;stageId:string;topic:string;attemptId:string;reviewedAt:string;incorrectCount:number;unansweredCount:number;questionCount:number};
-export type Checkpoint = {prompt:string;choices:string[];answer:number;explanation:string};
-export type LessonExtension = {intro:string;variables?:{symbol:string;meaning:string;unit:string}[];example?:{prompt:string;steps:string[];formula:string};checkpoint?:Checkpoint;assumption?:string};
+export type Checkpoint = {prompt:string;choices:string[];answer:number;explanation:string;hint?:string;choiceFeedback?:Record<number,{message:string;category:ErrorCategory}>};
+export type LessonExtension = {intro:string;variables?:{symbol:string;meaning:string;unit:string}[];example?:{prompt:string;steps:string[];formula:string;results?:{value:number;unit:string}[];verificationId?:string};checkpoint?:Checkpoint;assumption?:string};
 export type DifficultyVariant = {label:string;steps:Partial<Record<number,LessonExtension>>};
+
+export type ErrorCategory = 'conceptual' | 'formula-selection' | 'unit-conversion' | 'calculation' | 'assumptions' | 'unclassified';

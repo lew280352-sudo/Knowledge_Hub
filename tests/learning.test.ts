@@ -25,10 +25,10 @@ test('wave lab respects fixed medium speed, SI units and spatial period at all c
  assert.equal(6/1.5,4);assert.equal(4/2*1.5,3);assert.equal(2*Math.PI/Math.PI,2);assert.equal(4*Math.PI/Math.PI,4);
  assert.equal(12/3,4);assert.equal(12/6,2);assert.equal(360*.75/2-360*2*.125,45);
 });
-test('only first-wave extensions exist; fallback leaves canonical content and mappings untouched',()=>{
+test('first-wave extensions remain intact and other stages now have authored additions',()=>{
  for(const level of ['foundation','standard','advanced'] as const){
   for(let i=0;i<4;i++){assert.ok(getLessonExtension('s01',level,i));const q=firstWaveVariants[level].steps[i]?.checkpoint;if(q)assert.ok(q.answer>=0&&q.answer<q.choices.length);}
-  assert.equal(getLessonExtension('s02',level,0),undefined);
+  assert.ok(getLessonExtension('s02',level,0));
  }
  assert.equal(stages[0].steps[2].body,'ถ้าคลื่นมีความถี่ 5 Hz และความยาวคลื่น 2 m ในหนึ่งวินาทีรูปคลื่นเดินทางได้ 5 ลูกคลื่น จึงมีอัตราเร็ว 10 m/s');
 });

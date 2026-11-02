@@ -29,7 +29,7 @@ test('difficulty switches preserve canonical lesson progress and the fixed-speed
  const advancedCheck=page.locator('.lesson-extension .concept-checkpoint');await advancedCheck.getByRole('radio',{name:'x',exact:true}).check();await expect(advancedCheck.getByRole('button',{name:'ตรวจความเข้าใจ',exact:true})).toBeDisabled();await advancedCheck.getByLabel('อธิบายเหตุผลก่อนตรวจ').fill('กราฟเวลาเฝ้าดูการสั่นที่ตำแหน่ง x เดิม');await expect(advancedCheck.getByRole('button',{name:'ตรวจความเข้าใจ',exact:true})).toBeEnabled();
  const after=await (await page.request.get('/api/state')).json();expect(after.lessons).toEqual(before.lessons);
  for(const width of [320,390,820,1440]){await page.setViewportSize({width,height:1000});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();await expect(lab).toBeVisible();}
- await page.goto('/?view=stage&id=s02&tab=learn');await expect(page.locator('.lesson-level')).toContainText('ใช้บทเรียนต้นฉบับ');await expect(page.getByRole('heading',{name:'การซ้อนทับคือการบวกแบบมีเครื่องหมาย',exact:true})).toBeVisible();
+ await page.goto('/?view=stage&id=s02&tab=learn');await expect(page.locator('.lesson-level')).toContainText('บทเรียนต้นฉบับ + เนื้อหาเสริม');await expect(page.getByRole('heading',{name:'การซ้อนทับคือการบวกแบบมีเครื่องหมาย',exact:true})).toBeVisible();
  const pref=await (await page.request.get('/api/preferences')).json();await page.request.post('/api/preferences',{data:{...pref,difficulty:'standard',goal:'exam-prep'}});
 });
 test('submitted answers yield transparent review and direct lesson navigation; active answers stay protected',async({page})=>{
