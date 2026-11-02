@@ -1,0 +1,9 @@
+'use client';
+import {useState} from 'react';
+import {PhysicsDiagram} from './physics-diagram';
+import {MathFormula} from './math';
+import {ConceptCheckpoint} from './concept-checkpoint';
+export function WaveLab(){
+ const [prediction,setPrediction]=useState(''),[reason,setReason]=useState('');
+ return <section className="wave-lab" aria-labelledby="wave-lab-heading"><h3 id="wave-lab-heading">ห้องทดลอง: ความถี่กับความยาวคลื่น</h3><p>แบบจำลองคลื่นไซน์ในตัวกลางไม่กระจาย กำหนด v = 4 m/s คงที่ ภาพเป็นการกระจัดกับตำแหน่ง ณ t = 0 ไม่ใช่ภาพเคลื่อนไหว</p><fieldset><legend>1 · ทำนาย — ถ้า f จาก 2 เป็น 4 Hz จะเกิดอะไรกับ λ? (ข้ามได้)</legend>{['ยาวขึ้น','สั้นลง','เท่าเดิม'].map(text=><label key={text}><input type="radio" name="wave-prediction" checked={prediction===text} onChange={()=>setPrediction(text)}/>{text}</label>)}</fieldset><h4>2 · ทดลอง — เปลี่ยนความถี่หรือแอมพลิจูด</h4><PhysicsDiagram diagram={{kind:'wave',values:{wavelength:2,frequency:2,speed:4,amplitude:1},caption:'แกนตำแหน่งคงที่ 0–12 m; การกระจัดหน่วย m; เปลี่ยน A ไม่เปลี่ยน v'}} interactive fixedWaveSpeed={4}/><div className="lab-observation"><h4>3 · สังเกตความสัมพันธ์</h4><MathFormula formula="\\lambda=v/f,\\quad T=1/f,\\quad y(x,0)=A\\sin(2\\pi x/\\lambda)"/><p>เมื่อ f = 2 Hz ได้ λ = 2 m; เมื่อ f = 4 Hz ได้ λ = 1 m สันคลื่นชิดกันขึ้น แอมพลิจูดเปลี่ยนความสูง ไม่เปลี่ยน λ ในแบบจำลองนี้</p></div><label className="reasoning-field" htmlFor="wave-reason">4 · อธิบาย — เหตุใด f เพิ่มแล้ว λ ลดลงเมื่อ v คงที่?<textarea id="wave-reason" value={reason} onChange={e=>setReason(e.target.value)} placeholder="ลองใช้ความหมายของระยะทางในหนึ่งวินาทีอธิบาย"/></label><p className="muted">คำทำนายและข้อความนี้ใช้คิดทบทวนในหน้านี้ ไม่ส่งให้คะแนนหรือบันทึกข้ามอุปกรณ์</p><ConceptCheckpoint question={{prompt:'5 · ประยุกต์ — ที่ v = 4 m/s ถ้า f = 0.5 Hz แล้ว λ เท่าไร?',choices:['2 m','4 m','8 m'],answer:2,explanation:'λ = v/f = 4/0.5 = 8 m; ความถี่ลดลงในตัวกลางเดิมทำให้ความยาวคลื่นเพิ่มขึ้น'}}/></section>;
+}
