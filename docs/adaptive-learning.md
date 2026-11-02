@@ -91,3 +91,5 @@ The first three implementation commits isolate foundation, lesson architecture a
 - `tests/e2e/adaptive.spec.ts`
 - `tests/learning.test.ts`
 - `tests/store.test.ts`
+
+Manual follow-up identified the framework's default 50%-alpha textarea placeholder in an axe incomplete case. A separate small follow-up commit gives placeholders the opaque secondary-text token; this changes presentation only. The production build also passed, and the packaged archive contains the additive migration without preview database files or sample learner data.
