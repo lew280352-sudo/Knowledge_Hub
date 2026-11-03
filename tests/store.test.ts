@@ -163,7 +163,11 @@ test('AI lessons, games and exams persist independently of original physics reco
   await store.saveLesson('alice',{stageId:'s01',step:1,completed:[0],revision:0});
   await store.saveLesson('alice',{stageId:'ai-01',step:2,completed:[0,1],revision:0});
   await store.saveGame('alice',{id:'ai-game-001',stageId:'ai-01',correct:4,total:4});
-  const ai=await store.createAttempt('alice',{subject:'ai',count:20});
+  const ai=await store.createAttempt('alice',{subject:'ai',count:15});
+  assert.equal(new Set(ai.questions.map(q=>q.sourceId)).size,15);
+  for(const count of [16,20,40,70])await assert.rejects(()=>store.createAttempt('alice',{subject:'ai',count}),/invalid/);
+  await assert.rejects(()=>store.createAttempt('alice',{stageId:'ai-01',count:5}),/invalid/);
+  const stageAI=await store.createAttempt('alice',{stageId:'ai-01',count:3});assert.equal(new Set(stageAI.questions.map(q=>q.sourceId)).size,3);
   assert.equal(ai.chapter,'ai-intro');assert.ok(ai.questions.every(q=>q.stageId.startsWith('ai-')));
   assert.ok(ai.questions.every(q=>!('answer' in q)));
   const physics=await store.createAttempt('alice',{subject:'physics',count:20});
@@ -177,5 +181,18 @@ test('AI lessons, games and exams persist independently of original physics reco
   assert.deepEqual(state.lessons.find(p=>p.stageId==='ai-01')?.completed,[0,1]);
   assert.equal(state.games[0].stageId,'ai-01');assert.ok(state.review?.some(r=>r.stageId.startsWith('ai-')));
   assert.equal((await store.readState('bob')).lessons.length,0);
+ }finally{close();}
+});
+
+test('AI size limits affect new sets while saved larger sets remain readable and submittable',async()=>{
+ const {store,sqlite,close}=setup();
+ try{
+  const attempt=await store.createAttempt('legacy-learner',{subject:'ai',count:15});
+  const row=sqlite.prepare('SELECT questions FROM exam_attempts WHERE id=?').get(attempt.id) as {questions:string};
+  const original=JSON.parse(row.questions) as {id:string}[];
+  const questions=[...original,...original.slice(0,5).map(q=>({...q,id:`${q.id}-legacy`}))];
+  sqlite.prepare('UPDATE exam_attempts SET questions=? WHERE id=?').run(JSON.stringify(questions),attempt.id);
+  assert.equal((await store.getAttempt('legacy-learner',attempt.id)).questions.length,20);
+  assert.equal((await store.submitAttempt('legacy-learner',attempt.id,0)).questions.length,20);
  }finally{close();}
 });
