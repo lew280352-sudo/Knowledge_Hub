@@ -112,7 +112,7 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
   identity(user);invalid(Number.isInteger(options.count)&&options.count>=1&&options.count<=70&&(!options.stageId||stages.some(s=>s.id===options.stageId))&&(!options.chapter||chapters.some(c=>c.id===options.chapter))&&(!options.minutes||(Number.isInteger(options.minutes)&&options.minutes>=1&&options.minutes<=180)));
   invalid(!options.subject||subjects.some(s=>s.id===options.subject));
   const subject=options.subject??(options.stageId?subjectForStage(options.stageId)?.id:options.chapter==='ai-intro'?'ai':'physics');
-  const pool=sourceQuestions.filter(q=>subjectForStage(q.stageId)?.id===subject&&(!options.stageId||q.stageId===options.stageId)&&(!options.chapter||q.chapter===options.chapter));invalid(pool.length>0);
+  const pool=sourceQuestions.filter(q=>subjectForStage(q.stageId)?.id===subject&&(!options.stageId||q.stageId===options.stageId)&&(!options.chapter||q.chapter===options.chapter));invalid(pool.length>0&&(subject!=='ai'||options.count<=pool.length));
   const shuffled=[...pool];for(let i=shuffled.length-1;i>0;i--){const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
   const used=new Set<string>();const questions:QuestionSnapshot[]=[];
   for(let i=0;i<options.count;i++){

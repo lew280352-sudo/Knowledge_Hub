@@ -13,7 +13,10 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "validate:physics": "python scripts/validation/validate_physics.py",
+    "validate:math": "node --experimental-strip-types --test tests/math.test.ts",
+    "check:types": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

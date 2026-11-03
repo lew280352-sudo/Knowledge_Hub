@@ -15,7 +15,7 @@ test('catalog opens AI, preserves subject navigation and supports lesson, game a
  for(let i=0;i<4;i++){await left.getByRole('button').nth(i).click();await right.getByRole('button',{name:answers[i],exact:true}).click();}
  await expect(page.locator('.game-complete')).toContainText('บันทึกผลแล้ว');
  await page.getByRole('button',{name:'ลองทำข้อสอบ',exact:true}).click();
- await page.getByRole('button',{name:'เริ่มทำ 5 ข้อ'}).click();
+ await page.getByRole('button',{name:'เริ่มทำ 3 ข้อ'}).click();
  await expect(page.getByTestId('question-prompt')).toBeVisible();
  await page.getByTestId('answer-choice').first().click();
  await page.getByRole('button',{name:'ส่งชุดนี้และดูเฉลย',exact:true}).click();
@@ -25,4 +25,15 @@ test('catalog opens AI, preserves subject navigation and supports lesson, game a
  await page.getByRole('button',{name:'ทุกวิชา',exact:true}).click();
  await page.locator('.subject-card').nth(1).getByRole('button').click();
  await expect(page.locator('.stage-row')).toHaveCount(20);
+});
+
+test('AI setup caps exam size, API rejects repeated templates, and source link uses current repository',async({page})=>{
+ await page.goto('/?view=exam&subject=ai');
+ await expect(page.getByLabel('จำนวนข้อ')).toHaveValue('15');
+ await expect(page.getByLabel('จำนวนข้อ').locator('option')).toHaveText(['5 ข้อ','10 ข้อ','15 ข้อ']);
+ expect((await page.request.post('/api/attempts',{data:{subject:'ai',count:20}})).status()).toBe(400);
+ await expect(page.getByRole('link',{name:/Source บน GitHub/})).toHaveAttribute('href','https://github.com/lew280352-sudo/Knowledge_Hub');
+ await page.goto('/?view=stage&id=ai-01&tab=test');
+ await expect(page.getByLabel('จำนวนข้อ').locator('option')).toHaveText(['3 ข้อ']);
+ await expect(page.getByRole('button',{name:'เริ่มทำ 3 ข้อ'})).toBeVisible();
 });

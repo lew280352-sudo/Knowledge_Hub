@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {subjects,allStages,allSourceQuestions} from '../lib/subjects.ts';
+import {subjects,allStages,allSourceQuestions,examQuestionCounts} from '../lib/subjects.ts';
 import {generateQuestion} from '../lib/questions.ts';
 import {learningOverview} from '../lib/learning.ts';
 test('subject IDs, stages and question sources remain distinct and AI practice is valid',()=>{
@@ -14,4 +14,13 @@ test('subject IDs, stages and question sources remain distinct and AI practice i
  const overview=learningOverview([],{s01:100},[],ai.stages);
  assert.equal(overview.completed,0);assert.equal(overview.stage.id,'ai-01');
  assert.equal(subjects.find(s=>s.id==='physics')?.stages.length,20);
+});
+
+test('AI exam counts follow the selected pool while physics keeps numerical practice sizes',()=>{
+ assert.deepEqual(examQuestionCounts('ai',15),[5,10,15]);
+ assert.deepEqual(examQuestionCounts('ai',3),[3]);
+ assert.deepEqual(examQuestionCounts('ai',2),[2]);
+ assert.deepEqual(examQuestionCounts('ai',0),[]);
+ assert.deepEqual(examQuestionCounts('ai',100),[5,10,15,70]);
+ assert.deepEqual(examQuestionCounts('physics',3),[5,10,20,40,70]);
 });

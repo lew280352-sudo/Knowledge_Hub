@@ -13,7 +13,7 @@
 
 ## ใช้งาน
 
-- 20 ด่าน ครอบคลุมคลื่น แสงเชิงคลื่น แสงเชิงรังสี และเสียง จาก PDF 58 หน้าที่แนบใน repo
+- 20 ด่าน ครอบคลุมคลื่น แสงเชิงคลื่น แสงเชิงรังสี และเสียง จาก PDF 56 หน้าที่แนบใน repo
 - เลือกเนื้อหาเสริม 3 ระดับครบ 20 ด่าน พร้อมห้องทดลองแบบมีคำถามนำ 19 ด่าน ภาพที่ปรับค่าจริงได้ เกมจับคู่สูตร/ความหมาย และแบบทดสอบท้ายด่าน
 - 70 แม่แบบอิงแนวโจทย์ในเอกสาร สุ่มตัวเลขและตัวเลือกใหม่ พร้อมคำนวณเฉลยตามค่าของชุดนั้น
 - เลือกบท จำนวนข้อ และการจับเวลาได้ เกณฑ์ผ่านด่าน 80%
@@ -80,3 +80,9 @@ GitHub Actions ตรวจ TypeScript, unit/integration, production build แ�
 - [การบันทึกสมุดทดลองและการกู้คืนร่าง](docs/lab-notebook.md)
 
 ใช้ Superpowers, design-taste-frontend, Impeccable, Lucide / Simple Icons และ Playwright ตาม brief ฟอนต์ IBM Plex Sans Thai อยู่ภายใต้ OFL ดู `public/fonts/OFL.txt` ไอคอน GitHub มาจาก Simple Icons; ภาพฟิสิกส์เป็น SVG ที่วาดจากค่าจริง
+
+## ตรวจคุณภาพเนื้อหาและสมการ
+
+ใช้ `npm run validate:math` ตรวจการแสดงสูตร และ `npm run validate:physics` ตรวจโจทย์ด้วยตัวคำนวณอิสระ ติดตั้งเครื่องมือตรวจออฟไลน์ด้วย `python -m pip install -r scripts/validation/requirements.txt` ก่อน
+
+ดูผลตรวจ ข้อผิดพลาดที่ยืนยันแล้ว และข้อจำกัดใน [รายงานคุณภาพ](docs/learning-quality-audit.md) และ [ทะเบียนโจทย์ฟิสิกส์ครบ 70 แม่แบบ](docs/physics-audit-inventory.md)

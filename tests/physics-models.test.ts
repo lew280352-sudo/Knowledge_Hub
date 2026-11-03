@@ -26,7 +26,7 @@ test('slit intensity has the right central limit, dark bands and scale without s
 test('resonance respects displacement boundary conditions at both ends and integer modes',()=>{
  for(const closed of [false,true])for(const n of [1,2,3,4]){
   const r=resonance(1,n,340,closed);close(r.frequency*r.wavelength,340);
-  const kL=2*Math.PI*r.cycles;if(closed){close(Math.sin(0),0);close(Math.cos(kL),0);}else{close(Math.sin(0),0);close(Math.sin(kL),0);}
+  const kL=2*Math.PI*r.cycles;if(closed){close(Math.sin(0),0);close(Math.cos(kL),0);}else{close(Math.abs(Math.cos(0)),1);close(Math.abs(Math.cos(kL)),1);}
  }
  close(resonance(.5,2,340,true).frequency,510);assert.throws(()=>resonance(1,1.5,340,true),RangeError);assert.equal(snapControl(1.7,1,4,1),2);assert.equal(snapControl(9,1,4,1),4);
 });
@@ -37,4 +37,17 @@ test('sound and supersonic models retain physical domains and limiting cases',()
 });
 test('guided labs have learning objectives, observation constraints and valid apply checkpoints',()=>{
  assert.equal(Object.keys(labs).length,18);for(const [id,lab]of Object.entries(labs)){assert.ok(lab.objective&&lab.prediction&&lab.observe, id);assert.ok(lab.apply.choices[lab.apply.answer]);assert.ok(lab.apply.explanation&&lab.apply.hint);}
+});
+
+test('models reject nonfinite inputs instead of producing invalid physical readouts',()=>{
+ for(const bad of [NaN,Infinity,-Infinity]){
+  for(const run of [()=>refraction(30,bad),()=>slitSpacing(600,bad,.3),()=>slitIntensity(bad,600,2,.3),()=>slitIntensity(0,600,2,.3,false,bad),()=>resonance(bad,1,340,true),()=>pointSound(1,bad),()=>doppler(440,bad,0),()=>machGeometry(bad,1),()=>gratingAngle(bad,500,1)])assert.throws(run,RangeError);
+ }
+});
+test('open pipe displacement has antinodes at both ends, closed pipe a node and an antinode',()=>{
+ for(const mode of [1,2,3,4]){
+  const open=resonance(1,mode,340,false),closed=resonance(1,mode,340,true);
+  close(Math.abs(Math.cos(0)),1);close(Math.abs(Math.cos(2*Math.PI*open.cycles)),1);
+  close(Math.sin(0),0);close(Math.abs(Math.sin(2*Math.PI*closed.cycles)),1);
+ }
 });
