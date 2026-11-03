@@ -2,7 +2,7 @@
 
 เว็บเรียนรู้หลายวิชาภาษาไทยสำหรับใช้ส่วนตัว เรียนต่อได้ด้วยบัญชี ChatGPT เดิมบนหลายอุปกรณ์
 
-ที่อยู่เว็บส่วนตัว: https://physic-learn-lew.kurunaa.chatgpt.site
+ที่อยู่เว็บส่วนตัว: https://knowledge-hub.kurunaa.chatgpt.site
 
 ## วิชาและการเพิ่มเนื้อหา
 
