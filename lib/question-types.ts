@@ -1,5 +1,5 @@
-export type ChapterId = 'waves' | 'wave-optics' | 'ray-optics' | 'sound';
-export type DiagramKind = 'wave' | 'superposition' | 'reflection' | 'refraction' | 'interference' | 'slits' | 'lens' | 'colors' | 'sound' | 'resonance' | 'doppler' | 'shock';
+export type ChapterId = 'ai-intro' | 'waves' | 'wave-optics' | 'ray-optics' | 'sound';
+export type DiagramKind = 'ai' | 'wave' | 'superposition' | 'reflection' | 'refraction' | 'interference' | 'slits' | 'lens' | 'colors' | 'sound' | 'resonance' | 'doppler' | 'shock';
 export type Diagram = { kind: DiagramKind; values: Record<string,number>; caption?: string };
 export type LessonStep = { title:string; body:string; formula?:string; note?:string };
 export type MatchPair = { left:string; right:string };

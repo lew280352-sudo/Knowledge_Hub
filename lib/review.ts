@@ -1,5 +1,5 @@
 import {classifyReviewEvidence} from './concepts.ts';
-import {sourceQuestions} from './curriculum.ts';
+import {allSourceQuestions as sourceQuestions} from './subjects.ts';
 import type {ReviewRecommendation} from './question-types.ts';
 /** Rows are server-only submitted snapshots from the latest attempt for each source. */
 export type ReviewEvidence={attempt_id:string;submitted_at:string;source_id:string;question_id:string;expected:string;answers:string};

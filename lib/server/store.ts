@@ -1,4 +1,5 @@
-import { stages, sourceQuestions, chapters, getStage } from '../curriculum.ts';
+import {getStage} from '../curriculum.ts';
+import {allStages as stages,allSourceQuestions as sourceQuestions,allChapters as chapters,subjects,subjectForStage} from '../subjects.ts';
 import {isNotebookStage,sameLabText,validLabText,type LabNotebook,type NotebookDraft} from '../notebook.ts';
 import {deriveReview} from '../review.ts';
 import {defaultPreferences,difficultyOptions,goalOptions} from '../learning.ts';
@@ -8,7 +9,7 @@ export type Statement={bind(...args:unknown[]):Statement;first():Promise<any>;al
 export type SqlDatabase={prepare(sql:string):Statement};
 export class StoreError extends Error{status:number;constructor(message:string,status=400){super(message);this.status=status;}}
 type Row={id:string;user_id:string;stage_id:string|null;chapter:ChapterId|null;status:'active'|'submitted';revision:number;questions:string;answers:string;current_index:number;last_event_id:string|null;created_at:string;submitted_at:string|null;deadline:string|null;score:number|null;correct_count:number|null};
-export type AttemptOptions={stageId?:string|null;chapter?:ChapterId|null;count:number;minutes?:number|null};
+export type AttemptOptions={subject?:string;stageId?:string|null;chapter?:ChapterId|null;count:number;minutes?:number|null};
 export type AnswerUpdate={revision:number;answers:Record<string,string>;currentIndex:number;eventId:string};
 function identity(user:string){if(!user||user.length>200)throw new StoreError('unauthorized',401);}
 function invalid(condition:unknown){if(!condition)throw new StoreError('invalid_request');}
@@ -109,7 +110,9 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
  }
  async function createAttempt(user:string,options:AttemptOptions):Promise<Attempt>{
   identity(user);invalid(Number.isInteger(options.count)&&options.count>=1&&options.count<=70&&(!options.stageId||stages.some(s=>s.id===options.stageId))&&(!options.chapter||chapters.some(c=>c.id===options.chapter))&&(!options.minutes||(Number.isInteger(options.minutes)&&options.minutes>=1&&options.minutes<=180)));
-  const pool=sourceQuestions.filter(q=>(!options.stageId||q.stageId===options.stageId)&&(!options.chapter||q.chapter===options.chapter));invalid(pool.length>0);
+  invalid(!options.subject||subjects.some(s=>s.id===options.subject));
+  const subject=options.subject??(options.stageId?subjectForStage(options.stageId)?.id:options.chapter==='ai-intro'?'ai':'physics');
+  const pool=sourceQuestions.filter(q=>subjectForStage(q.stageId)?.id===subject&&(!options.stageId||q.stageId===options.stageId)&&(!options.chapter||q.chapter===options.chapter));invalid(pool.length>0);
   const shuffled=[...pool];for(let i=shuffled.length-1;i>0;i--){const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
   const used=new Set<string>();const questions:QuestionSnapshot[]=[];
   for(let i=0;i<options.count;i++){
@@ -118,7 +121,7 @@ export function createStore(db:SqlDatabase,clock:()=>Date=()=>new Date()){
    if(used.has(q.id))throw new StoreError('generation_failed',503);used.add(q.id);questions.push(q);
   }
   const id=crypto.randomUUID(),created=clock(),deadline=options.minutes?new Date(created.getTime()+options.minutes*60000).toISOString():null;
-  await run("INSERT INTO exam_attempts (id,user_id,stage_id,chapter,status,revision,questions,answers,current_index,created_at,deadline) VALUES (?,?,?,?,'active',0,?,'{}',0,?,?)",id,user,options.stageId??null,options.chapter??null,JSON.stringify(questions),created.toISOString(),deadline);
+  await run("INSERT INTO exam_attempts (id,user_id,stage_id,chapter,status,revision,questions,answers,current_index,created_at,deadline) VALUES (?,?,?,?,'active',0,?,'{}',0,?,?)",id,user,options.stageId??null,options.chapter??(subject==='ai'?'ai-intro':null),JSON.stringify(questions),created.toISOString(),deadline);
   return toAttempt(await rowFor(user,id)) as Attempt;
  }
  async function updateAttempt(user:string,id:string,input:AnswerUpdate):Promise<Attempt|ReviewedAttempt>{

@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 test('all formula cards and legacy solutions render correctly on touch-sized screens',async({browser})=>{
  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await context.newPage();
- await page.goto('/');await expect(page.getByRole('heading',{name:'เข้าใจฟิสิกส์ ทีละจังหวะ'})).toBeVisible();await page.getByRole('button',{name:'เปิดเมนู',exact:true}).tap();await expect(page.getByRole('button',{name:'เปิดเมนู',exact:true})).toHaveAttribute('aria-expanded','true');await page.getByRole('button',{name:'สมุดสูตร',exact:true}).tap();
+ await page.goto('/?view=home&subject=physics');await expect(page.getByRole('heading',{name:'เข้าใจฟิสิกส์ ทีละจังหวะ'})).toBeVisible();await page.getByRole('button',{name:'เปิดเมนู',exact:true}).tap();await expect(page.getByRole('button',{name:'เปิดเมนู',exact:true})).toHaveAttribute('aria-expanded','true');await page.getByRole('button',{name:'สมุดสูตร',exact:true}).tap();
  await expect(page.locator('.formula-entry')).toHaveCount(20);await page.evaluate(()=>document.fonts.ready);
  await expect(page.locator('.katex-error')).toHaveCount(0);
  const visibleMath=await page.locator('.math-formula .katex-html').allTextContents();expect(visibleMath.join(' ')).not.toMatch(/quad|lambdaquad/);
