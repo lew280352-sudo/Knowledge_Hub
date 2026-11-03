@@ -156,3 +156,26 @@ test('adding notebook storage preserves every original row, preference and exact
  for(const file of readdirSync('drizzle').filter(f=>f.startsWith('0002')&&f.endsWith('.sql')))sqlite.exec(readFileSync(`drizzle/${file}`,'utf8'));
  assert.deepEqual(tables.map(t=>sqlite.prepare(`SELECT * FROM ${t}`).all()),before);assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM lab_notebooks').get()?.n,0);sqlite.close();
 });
+
+test('AI lessons, games and exams persist independently of original physics records',async()=>{
+ const {store,close}=setup();
+ try{
+  await store.saveLesson('alice',{stageId:'s01',step:1,completed:[0],revision:0});
+  await store.saveLesson('alice',{stageId:'ai-01',step:2,completed:[0,1],revision:0});
+  await store.saveGame('alice',{id:'ai-game-001',stageId:'ai-01',correct:4,total:4});
+  const ai=await store.createAttempt('alice',{subject:'ai',count:20});
+  assert.equal(ai.chapter,'ai-intro');assert.ok(ai.questions.every(q=>q.stageId.startsWith('ai-')));
+  assert.ok(ai.questions.every(q=>!('answer' in q)));
+  const physics=await store.createAttempt('alice',{subject:'physics',count:20});
+  assert.ok(physics.questions.every(q=>q.stageId.startsWith('s')));
+  await assert.rejects(()=>store.createAttempt('alice',{subject:'ai',stageId:'s01',count:5}),/invalid/);
+  await assert.rejects(()=>store.createAttempt('alice',{subject:'unknown',count:5}),/invalid/);
+  const submitted=await store.submitAttempt('alice',ai.id,0);
+  assert.equal(submitted.score,0);assert.ok(submitted.questions.every(q=>q.explanation.length>0));
+  const state=await store.readState('alice');
+  assert.deepEqual(state.lessons.find(p=>p.stageId==='s01')?.completed,[0]);
+  assert.deepEqual(state.lessons.find(p=>p.stageId==='ai-01')?.completed,[0,1]);
+  assert.equal(state.games[0].stageId,'ai-01');assert.ok(state.review?.some(r=>r.stageId.startsWith('ai-')));
+  assert.equal((await store.readState('bob')).lessons.length,0);
+ }finally{close();}
+});

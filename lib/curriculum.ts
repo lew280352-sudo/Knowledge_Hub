@@ -1,3 +1,4 @@
+import {aiStages,aiSourceQuestions} from './ai-curriculum.ts';
 import type { ChapterId, DiagramKind, MatchPair, SourceQuestion, Stage, Progress } from './question-types.ts';
 export const chapters:{id:ChapterId;title:string;subtitle:string;color:string;pages:string}[]=[
  {id:'waves',title:'คลื่น',subtitle:'อ่านจังหวะและการเคลื่อนที่',color:'#087f8c',pages:'1–14, 58'},
@@ -121,15 +122,15 @@ export const stages:Stage[]=[
  ],pairs('M = vS/v|เลขมัค','M > 1|เร็วกว่าเสียง','sinμ = 1/M|ครึ่งมุมยอดกรวย','h/tanμ|ระยะแนวราบหลังผ่านศีรษะ')),
 ];
 // Each tuple is [source question number, PDF page, stage number, short topic].
-const inventory:Record<ChapterId,[number,number,number,string][]>= {
+const inventory:Record<Exclude<ChapterId,'ai-intro'>,[number,number,number,string][]>= {
  'waves':[[1,7,1,'คลื่นตามยาว'],[2,7,1,'ความถี่จากระยะสันคลื่น'],[3,7,1,'ความเร็วจากกราฟระยะและเวลา'],[4,8,1,'ความยาวคลื่นและมิลลิวินาที'],[5,8,1,'สันคลื่นถึงสมดุล'],[6,8,1,'แอมพลิจูด คาบ และเฟส'],[7,9,1,'ผลต่างเฟส'],[8,9,2,'การซ้อนทับคลื่นดล'],[9,10,3,'รอยต่อเชือก'],[10,11,3,'คลื่นสะท้อนปลายตรึง'],[11,12,4,'น้ำลึกสู่น้ำตื้น'],[12,12,4,'กฎหักเหคลื่น'],[13,12,4,'ความถี่คงเดิม'],[14,13,4,'มุมหน้าคลื่น'],[15,13,5,'คลื่นนิ่งบนเชือก'],[16,14,5,'แนวแทรกสอด'],[17,14,5,'บัพและปฏิบัพ'],[18,14,5,'นับแนวจากผลต่างทางเดิน'],[19,58,5,'จำนวนแนวบัพปฏิบัพ'],[20,58,5,'ช่องเปิดและการเลี้ยวเบน']],
  'wave-optics':[[1,17,6,'ความยาวคลื่นจากสลิตคู่'],[2,17,6,'ระยะช่องจากริ้วแสง'],[3,18,6,'ระยะระหว่างแถบ'],[4,18,7,'ความหนาแน่นเกรตติง'],[5,19,7,'อ่านรูปแถบเกรตติง'],[6,20,7,'จำนวนแถบสว่าง'],[7,20,8,'แถบมืดสลิตเดี่ยว'],[8,21,8,'ความกว้างแถบกลาง'],[9,21,8,'ขนาดเส้นลวดจากเลี้ยวเบน'],[10,22,9,'จำนวนริ้วใต้ซองกลาง']],
  'ray-optics':[[1,29,10,'กระจกทำมุม'],[2,29,10,'กระจกเห็นเต็มตัว'],[3,30,10,'ระยะภาพกระจกราบ'],[4,30,10,'การหมุนกระจก'],[5,31,10,'ความเร็วภาพ'],[6,31,11,'สมบัติแสงผ่านรอยต่อ'],[7,32,11,'ดัชนีหักเห'],[8,32,11,'แสงผ่านปริซึม'],[9,33,12,'มุมวิกฤต'],[10,34,12,'การมองผ่านผิวโค้งตรงแนวฉาก'],[11,34,12,'ความลึกปรากฏ'],[12,35,13,'ภาพหัวตั้งจากเลนส์'],[13,35,13,'ภาพเสมือนขยาย'],[14,36,13,'ชนิดเลนส์'],[15,36,14,'ภาพกระจกเว้า'],[16,36,14,'ภาพกระจกนูน'],[17,37,13,'ความยาวโฟกัสจากรูป'],[18,37,15,'เลนส์สองชิ้น'],[19,38,15,'สีผ่านแผ่นกรอง'],[20,38,15,'วัตถุภายใต้แสงสี']],
  'sound':[[1,50,16,'เสียงสูงต่ำและคุณภาพ'],[2,50,16,'เสียงสะท้อนและความถี่'],[3,50,16,'เวลาเสียงในสองตัวกลาง'],[4,51,16,'เสียงหักเหในอากาศ'],[5,51,16,'ทางเดินเสียงสองแขนท่อ'],[6,51,17,'ความเข้มกับระยะ'],[7,52,17,'หลายแหล่งกำเนิด'],[8,52,17,'ระยะเพื่อลดระดับเสียง'],[9,53,17,'กำลังเสียง'],[10,53,18,'หลอดเรโซแนนซ์'],[11,53,18,'ความถี่จากเรโซแนนซ์'],[12,54,18,'ท่อเปิดและปิด'],[13,54,18,'อุณหภูมิกับเรโซแนนซ์'],[14,54,18,'คลื่นนิ่งบนเชือก'],[15,55,19,'บีตของส้อมเสียง'],[16,55,19,'ความยาวคลื่นหน้าและหลัง'],[17,55,19,'เสียงรถไฟเข้าหา'],[18,56,19,'ทิศทางดอปเพลอร์'],[19,57,20,'อัตราเร็วเครื่องบินจากมุม'],[20,57,20,'ระยะหลังผ่านศีรษะ']],
 };
 export const sourceQuestions:SourceQuestion[]=Object.entries(inventory).flatMap(([chapter,rows])=>rows.map(([number,page,s,topic])=>({id:`${chapter}-${number}`,chapter:chapter as ChapterId,number,page,stageId:`s${String(s).padStart(2,'0')}`,topic})));
-export function getStage(id:string){return stages.find(s=>s.id===id);}
-export function sourceForStage(id:string){return sourceQuestions.filter(q=>q.stageId===id);}
+export function getStage(id:string){return stages.find(s=>s.id===id)??aiStages.find(s=>s.id===id);}
+export function sourceForStage(id:string){return [...sourceQuestions,...aiSourceQuestions].filter(q=>q.stageId===id);}
 
 export function chooseResumeStage(lessons:Progress[],bestScores:Record<string,number>):Stage{
  const recent=[...lessons].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)).find(p=>getStage(p.stageId)&&!(bestScores[p.stageId]>=80));

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('dashboard keeps real statistics, responsive wave graph and keyboard category filtering', async ({ page }) => {
   const response = page.waitForResponse(r => r.url().endsWith('/api/state') && r.status() === 200);
-  await page.goto('/');
+  await page.goto('/?view=home&subject=physics');
   const state = await (await response).json();
   await expect(page.getByRole('heading', { name: 'เข้าใจฟิสิกส์ ทีละจังหวะ' })).toBeVisible();
   const passed = Object.values(state.bestScores).filter((v: unknown) => Number(v) >= 80).length;
@@ -34,7 +34,7 @@ test('zero and completed progress states remain honest and support visible focus
   let fixture = { displayName: 'Accessibility fixture', lessons: [], attempts: [], games: [], bestScores: {} as Record<string, number>, stats: { submittedAttempts: 0, games: 0 } };
   await page.route('**/api/state', route => route.fulfill({ json: fixture }));
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
+  await page.goto('/?view=home&subject=physics');
   const progress = page.getByRole('progressbar', { name: 'ด่านที่ผ่านทั้งหมด' });
   await expect(progress).toHaveAttribute('aria-valuenow', '0');
   expect(await progress.locator('span').evaluate(el => el.getBoundingClientRect().width)).toBe(0);

@@ -2,7 +2,7 @@ import {test,expect,type Page} from '@playwright/test';
 import {sourceQuestions} from '../../lib/curriculum';
 async function openPreferences(page:Page){const select=page.getByLabel('ระดับการเรียน',{exact:true});if(!await select.isVisible())await page.getByRole('button',{name:'ปรับแนวทาง',exact:true}).click();return select;}
 test('preferences survive devices and report conflicts and failed saves without resetting progress',async({browser})=>{
- const a=await browser.newContext(),b=await browser.newContext(),p=await a.newPage(),q=await b.newPage();await p.goto('/');await q.goto('/');
+ const a=await browser.newContext(),b=await browser.newContext(),p=await a.newPage(),q=await b.newPage();await p.goto('/?view=home&subject=physics');await q.goto('/?view=home&subject=physics');
  const before=await (await p.request.get('/api/state')).json();await openPreferences(p);await p.getByLabel('ระดับการเรียน',{exact:true}).selectOption('foundation');await p.getByLabel('เป้าหมายการเรียน',{exact:true}).selectOption('understanding');await p.getByRole('button',{name:'บันทึกแนวทาง',exact:true}).click();await expect(p.getByText('บันทึกแนวทางการเรียนแล้ว ใช้ต่อได้ทุกอุปกรณ์')).toBeVisible();
  await q.reload();await openPreferences(q);await expect(q.getByLabel('ระดับการเรียน',{exact:true})).toHaveValue('foundation');await expect(q.getByLabel('เป้าหมายการเรียน',{exact:true})).toHaveValue('understanding');
  await openPreferences(p);const latest=await (await q.request.get('/api/preferences')).json();expect((await q.request.post('/api/preferences',{data:{...latest,difficulty:'advanced',goal:'problem-solving'}})).ok()).toBeTruthy();
@@ -14,7 +14,7 @@ test('preferences survive devices and report conflicts and failed saves without 
 });
 test('new learner gets optional onboarding while existing learner is not forced through it',async({page})=>{
  let state:any={displayName:'Test learner',lessons:[],attempts:[],games:[],bestScores:{},stats:{games:0,submittedAttempts:0},preferences:{difficulty:'standard',goal:'exam-prep',revision:0,onboardingCompleted:false,updatedAt:null},review:[]};
- await page.route('**/api/state',route=>route.fulfill({json:state}));await page.goto('/');await expect(page.getByLabel('ระดับการเรียน',{exact:true})).toBeVisible();await page.getByRole('button',{name:'ไว้ภายหลัง',exact:true}).click();await expect(page.getByLabel('ระดับการเรียน',{exact:true})).toBeHidden();
+ await page.route('**/api/state',route=>route.fulfill({json:state}));await page.goto('/?view=home&subject=physics');await expect(page.getByLabel('ระดับการเรียน',{exact:true})).toBeVisible();await page.getByRole('button',{name:'ไว้ภายหลัง',exact:true}).click();await expect(page.getByLabel('ระดับการเรียน',{exact:true})).toBeHidden();
  state={...state,lessons:[{stageId:'s01',step:0,completed:[],revision:1,updatedAt:'2026-01-01'}]};await page.reload();await expect(page.getByRole('button',{name:'ปรับแนวทาง',exact:true})).toBeVisible();await expect(page.getByLabel('ระดับการเรียน',{exact:true})).toBeHidden();await expect(page.locator('.resume-copy .primary')).toHaveText('เรียนต่อ');
  state={...state,bestScores:Object.fromEntries(Array.from({length:20},(_,i)=>[`s${String(i+1).padStart(2,'0')}`,80]))};await page.reload();await expect(page.locator('.resume-copy .primary')).toHaveText('ทบทวนบทเรียน');await expect(page.locator('.study-facts dd').nth(1)).toContainText('0');
 });
@@ -33,7 +33,7 @@ test('difficulty switches preserve canonical lesson progress and the fixed-speed
  const pref=await (await page.request.get('/api/preferences')).json();await page.request.post('/api/preferences',{data:{...pref,difficulty:'standard',goal:'exam-prep'}});
 });
 test('submitted answers yield transparent review and direct lesson navigation; active answers stay protected',async({page})=>{
- await page.goto('/');const created=await (await page.request.post('/api/attempts',{data:{stageId:'s01',count:1}})).json();expect(JSON.stringify(created)).not.toContain('explanation');const source=sourceQuestions.find(s=>s.id===created.questions[0].sourceId)!;
+ await page.goto('/?view=home&subject=physics');const created=await (await page.request.post('/api/attempts',{data:{stageId:'s01',count:1}})).json();expect(JSON.stringify(created)).not.toContain('explanation');const source=sourceQuestions.find(s=>s.id===created.questions[0].sourceId)!;
  const activeState=await (await page.request.get('/api/state')).json();expect(JSON.stringify(activeState.review)).not.toContain(created.id);
  await page.request.post(`/api/attempts/${created.id}`,{data:{action:'submit',revision:0}});await page.reload();const row=page.locator('.review-list>li').filter({has:page.getByRole('heading',{name:source.topic,exact:true})});await expect(row).toContainText('เว้นว่าง 1 ข้อ');await row.getByRole('button',{name:'ทบทวนบทเรียน',exact:true}).click();await expect(page).toHaveURL(new RegExp(`id=${source.stageId}`));
  await page.goto(`/?view=exam&attempt=${created.id}`);await expect(page.getByText(`แนวคิด: ${source.topic}`,{exact:true})).toBeVisible();await page.locator('.review-footer').getByRole('button',{name:'ทบทวนบทเรียน',exact:true}).click();await expect(page).toHaveURL(new RegExp(`id=${source.stageId}`));

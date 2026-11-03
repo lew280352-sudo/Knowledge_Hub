@@ -4,7 +4,7 @@ import {getLessonExtension} from '../../lib/lesson-variants';
 async function stepOne(page:Page,id:string){await page.goto(`/?view=stage&id=${id}&tab=learn`);await page.locator('.step-link').nth(1).click();await expect(page.locator('.wave-lab')).toBeVisible();}
 async function validSvg(page:Page){expect(await page.locator('.lesson-content svg').evaluateAll(nodes=>nodes.every(el=>!/(?:NaN|Infinity)/.test(el.outerHTML)))).toBeTruthy();}
 test('all 20 stages render all three authored levels without writing progress or changing historical attempts',async({page})=>{
- test.setTimeout(180000);await page.goto('/');const original=await (await page.request.get('/api/state')).json();let difficulty='foundation';
+ test.setTimeout(180000);await page.goto('/?view=home&subject=physics');const original=await (await page.request.get('/api/state')).json();let difficulty='foundation';
  await page.route('**/api/state',route=>route.fulfill({json:{...original,lessons:[],preferences:{...original.preferences,difficulty}}}));
  for(const level of ['foundation','standard','advanced'] as const){difficulty=level;for(const stage of stages){await page.goto(`/?view=stage&id=${stage.id}&tab=learn`);await expect(page.locator('.lesson-extension>p').first()).toHaveText(getLessonExtension(stage.id,level,0)!.intro);await expect(page.locator('.katex-error')).toHaveCount(0);await validSvg(page);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();}}
  await page.unroute('**/api/state');const after=await (await page.request.get('/api/state')).json();expect(after.lessons).toEqual(original.lessons);expect(after.attempts).toEqual(original.attempts);
@@ -25,6 +25,6 @@ test('formative feedback offers hints, explanation, focus-safe retry and relevan
  await page.request.post('/api/preferences',{data:{...await (await page.request.get('/api/preferences')).json(),difficulty:pref.difficulty}});
 });
 test('review labels uncertainty, offers self-selected targeted practice and opens retry setup',async({page})=>{
- await page.goto('/');const state=await (await page.request.get('/api/state')).json();const item={sourceId:'qa-concept',stageId:'s04',topic:'แนวคิดทดสอบการทบทวน',attemptId:'qa-attempt',reviewedAt:'2026-11-02T00:00:00Z',incorrectCount:1,unansweredCount:0,questionCount:1,category:'unclassified',evidence:'answer-only'};
+ await page.goto('/?view=home&subject=physics');const state=await (await page.request.get('/api/state')).json();const item={sourceId:'qa-concept',stageId:'s04',topic:'แนวคิดทดสอบการทบทวน',attemptId:'qa-attempt',reviewedAt:'2026-11-02T00:00:00Z',incorrectCount:1,unansweredCount:0,questionCount:1,category:'unclassified',evidence:'answer-only'};
  await page.route('**/api/state',r=>r.fulfill({json:{...state,review:[item]}}));await page.reload();const review=page.locator('.review-list>li');await expect(review).toContainText('ยังไม่จัดประเภท');await review.getByLabel('อยากทบทวนด้านใด? (เลือกเองได้)').selectOption('unit-conversion');await expect(review.locator('.review-guidance')).toContainText('แปลงให้สอดคล้องกัน');await expect(review).toContainText('ไม่ใช่ผลวินิจฉัย');await review.getByRole('button',{name:'ลองทำข้อสอบด่านนี้ใหม่',exact:true}).click();await expect(page).toHaveURL(/id=s04&tab=test/);await expect(page.locator('.exam-setup')).toBeVisible();
 });

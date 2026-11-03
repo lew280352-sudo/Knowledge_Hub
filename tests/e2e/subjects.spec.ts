@@ -1,0 +1,28 @@
+import {test,expect} from '@playwright/test';
+test('catalog opens AI, preserves subject navigation and supports lesson, game and exam',async({page})=>{
+ await page.goto('/');
+ await expect(page.getByRole('heading',{name:'ทุกวิชา เริ่มที่ความเข้าใจ'})).toBeVisible();
+ for(const width of [360,1440]){await page.setViewportSize({width,height:1000});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();}
+ await page.locator('.subject-card').first().getByRole('button').click();
+ await expect(page.getByRole('heading',{name:'เข้าใจปัญญาประดิษฐ์ ทีละจังหวะ'})).toBeVisible();
+ await expect(page.locator('.stage-row')).toHaveCount(5);
+ await page.locator('.stage-row').first().click();
+ await expect(page.locator('.lesson-content')).toContainText('AI ทำงานที่ต้องใช้ความสามารถทางปัญญา');
+ await expect(page.locator('.source-link')).toHaveAttribute('href',/references\/ai-01.pdf/);
+ await page.getByRole('button',{name:'เกมจับคู่',exact:true}).click();
+ const left=page.locator('.match-grid > div').first(),right=page.locator('.match-grid > div').last();
+ const answers=['ขอบเขตกว้างของระบบที่ทำงานทางปัญญา','เรียนรู้รูปแบบจากข้อมูล','ใช้โครงข่ายประสาทเทียมหลายชั้น','สิ่งที่ใช้ทำนายจากรูปแบบที่เรียนรู้'];
+ for(let i=0;i<4;i++){await left.getByRole('button').nth(i).click();await right.getByRole('button',{name:answers[i],exact:true}).click();}
+ await expect(page.locator('.game-complete')).toContainText('บันทึกผลแล้ว');
+ await page.getByRole('button',{name:'ลองทำข้อสอบ',exact:true}).click();
+ await page.getByRole('button',{name:'เริ่มทำ 5 ข้อ'}).click();
+ await expect(page.getByTestId('question-prompt')).toBeVisible();
+ await page.getByTestId('answer-choice').first().click();
+ await page.getByRole('button',{name:'ส่งชุดนี้และดูเฉลย',exact:true}).click();
+ await page.getByRole('button',{name:'ยืนยันส่งชุดนี้'}).click();
+ await expect(page.getByRole('heading',{name:'ผลการทำข้อสอบ'})).toBeVisible();
+ await expect(page.locator('.review-footer a').first()).toHaveAttribute('href',/references\/ai-01.pdf/);
+ await page.getByRole('button',{name:'ทุกวิชา',exact:true}).click();
+ await page.locator('.subject-card').nth(1).getByRole('button').click();
+ await expect(page.locator('.stage-row')).toHaveCount(20);
+});

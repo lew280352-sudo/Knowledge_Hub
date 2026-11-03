@@ -1,8 +1,10 @@
+import {generateAIQuestion} from './ai-curriculum.ts';
 import { sourceQuestions } from './curriculum.ts';
 import type { Diagram, PublicQuestion, QuestionSnapshot } from './question-types.ts';
 export function formatNumber(value:number):string{return Number(value.toPrecision(4)).toString();}
 function random(seed:number){let state=(seed>>>0)||0x9e3779b9;return()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};}
 export function generateQuestion(sourceId:string,seed:number):QuestionSnapshot{
+ if(sourceId.startsWith('ai-intro-'))return generateAIQuestion(sourceId,seed);
  const source=sourceQuestions.find(q=>q.id===sourceId);
  if(!source||!Number.isSafeInteger(seed)||seed<0)throw new Error('Invalid source or seed');
  const rng=random(seed); const pick=<T,>(items:T[]):T=>items[Math.floor(rng()*items.length)];
