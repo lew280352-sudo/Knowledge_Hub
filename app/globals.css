@@ -320,3 +320,13 @@ button svg,a svg{flex-shrink:0}
 .diagram-controls input[type=range]{display:block}
 @media(max-width:700px){.diagram-controls .diagram-value{grid-column:2;justify-self:end}
 .diagram-controls input[type=range]{grid-row:2;grid-column:1/-1}}
+
+/* Keep fractions readable; long equations scroll inside their own container. */
+.math-formula {min-width:0;font-size:clamp(15px,1.15vw,18px);line-height:1.6;padding:12px;overscroll-behavior-x:contain}
+.math-formula .katex-display {text-align:left}
+.math-formula .katex-display > .katex {text-align:left}
+.math-unavailable {padding:12px;border:1px solid var(--border);border-radius:8px}
+.math-inline {display:inline-block;max-width:100%;vertical-align:middle;overflow-x:auto;overflow-y:hidden}
+.math-text-display {display:block}
+.subject-glossary dl {display:grid;gap:12px;margin:16px 0}
+.subject-glossary dd {margin:4px 0 0;line-height:1.8}

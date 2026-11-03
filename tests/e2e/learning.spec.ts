@@ -20,13 +20,13 @@ test('lesson resume, accessible matching, exam, history and mobile layout',async
  const prompt=await page.getByTestId('question-prompt').innerText();
  await page.getByTestId('answer-choice').first().click();
  await expect(page.getByText('บันทึกคำตอบแล้ว',{exact:true})).toBeVisible();
- await page.reload();await expect(page.getByTestId('question-prompt')).toHaveText(prompt);
+ await page.reload();await expect(page.getByTestId('question-prompt')).toHaveText(prompt,{useInnerText:true});
  await page.getByRole('button',{name:'ส่งชุดนี้และดูเฉลย',exact:true}).click();
  await page.getByRole('button',{name:'ยืนยันส่งชุดนี้',exact:true}).click();
  await expect(page.getByRole('heading',{name:'ผลการทำข้อสอบ'})).toBeVisible();
  await expect(page.getByText('วิธีคิด', {exact:true}).first()).toBeVisible();
  await page.getByRole('button',{name:'ประวัติการสอบ',exact:true}).first().click();
- await expect(page.getByRole('heading',{name:'ทุกครั้งที่ได้ลอง'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'ประวัติการสอบ'})).toBeVisible();
  await page.setViewportSize({width:390,height:844});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
  await expect(page.locator('#main-navigation')).toHaveAttribute('inert','');
