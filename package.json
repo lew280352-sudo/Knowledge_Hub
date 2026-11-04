@@ -16,7 +16,8 @@
     "test:e2e": "playwright test",
     "validate:physics": "python scripts/validation/validate_physics.py",
     "validate:math": "node --experimental-strip-types --test tests/math.test.ts",
-    "check:types": "tsc --noEmit"
+    "check:types": "tsc --noEmit",
+    "validate:pdf-solutions": "python scripts/solutions/validate-engineering-solutions.py"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

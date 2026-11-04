@@ -1,5 +1,7 @@
 # Learning quality audit — 3 November 2026
 
+> **Correction — 4 November 2026:** The 3 November page-count finding was wrong. The original PDF has **58 physical pages**, confirmed by its page-tree `/Count` and visual rendering. pypdf omitted physical pages 23 and 39 and returned 56. Finding P1 is retracted; references are restored to physical page numbers. See [the correction with evidence](pdf-page-count-correction.md). The independent numerical checks remain separate from this reference-index mistake.
+
 ## Scope and implementation plan
 
 Keep the existing React/TypeScript component structure, Vinext/Vite runtime, Cloudflare D1 storage, subject catalog, lesson/game/exam flow and visual design. Reuse the installed KaTeX renderer. Inspect learner text → audit formulas and givens → add independent offline checks → validate the existing features.
@@ -12,7 +14,7 @@ The source PDF is a reference, not an official solution key. Several website tas
 
 | ID | File / location | Before | Expected result and evidence | Resolution |
 | --- | --- | --- | --- | --- |
-| P1 | `lib/curriculum.ts`, `lib/subjects.ts`; `public/reference.pdf` | Declared 58 PDF pages; 43 question references pointed at wrong pages, including waves 19–20 at nonexistent page 58. Stage references were also shifted. | `len(PdfReader('public/reference.pdf').pages) = 56`. Waves 19–20 are on 56; wave-optics 7 on 20; ray-optics 1–20 on 28–37; sound 1–20 on 48–55. Checked question headings in the actual PDF. | Corrected the live index, stage links, subject page count and README. Historical question JSON is untouched. Reviewed exams resolve the current page by source ID, with their saved page as a fallback for unknown IDs. |
+| P1 — retracted 4 Nov | `lib/curriculum.ts`, `lib/subjects.ts`; `public/reference.pdf` | Earlier report incorrectly treated an extractor count of 56 as the document count. | Physical PDF page tree and MuPDF both give **58**. pypdf skips physical pages 23 and 39. | Restored physical page references; see `pdf-page-count-correction.md`. Historical snapshots and grades remain unchanged. |
 | P2 | `lib/questions.ts`, `wave-optics-9` | Seed 67108863 displayed 759.4 nm but calculated from hidden 759.36 nm. Stored numeric result was 0.075936 mm. | From displayed givens, a = λL/Δy = (759.4 × 10⁻⁹)(1)/(0.01) m = **0.07594 mm**. Both happen to round to the same four-significant-figure option; this was an internal precision inconsistency, not evidence of a misgraded option. | New questions use the displayed wavelength. This template is version 2; other versions and saved snapshots stay unchanged. |
 | P3 | `lib/questions.ts`, `wave-optics-9`; PDF page 21 | “Adjacent dark fringes” could mean across the central maximum. That gap is twice a same-side interval. | PDF explicitly places dark orders 1, 2, 3 at 1, 2, 3 cm from the center. Baseline a = 632.8 nm × 1 m / 0.01 m = **0.06328 mm**. | State orders 1 and 2 on the **same side**. This clarifies the intended task; it does not change its baseline answer. |
 | M1 | `components/math.tsx`, `lib/math-format.ts` | `throwOnError:false` could expose invalid TeX in red. Slash divisions were accepted by KaTeX as linear text, not stacked fractions. | KaTeX's API documents the raw-source fallback. Invalid inputs should produce a short Thai message; `v=12/3=4` should contain a fraction and aligned rows, with MathML available. | Strict rendering with a readable fallback, grouped slash-to-fraction presentation, aligned equality chains and multiple equations, scrollable equation containers, readable mobile size. Text/unit groups remain opaque. Historical repairs remain presentation-only. |
@@ -86,14 +88,14 @@ The final browser run took about three minutes. A startup race during a repeated
 
 Unresolved: the source PDF's magnification-sign legend on page 26 is not the same explanation as the website's explicitly signed-height convention m = −v/u. Original diagram-dependent or materially adapted PDF tasks have not been assigned invented official answers. Exact cancellation also needs equal amplitudes at the observation point, beyond phase alignment alone. The source PDF and archived solution snapshots are unchanged. An independent teacher review remains useful for those original-source conventions and diagrams.
 
-Earlier documents that cite a 58-page source predate this audit; use the corrected live index and this inventory for the current 56-page file.
+The original source has 58 physical pages. This report’s former 56-page assertion has been corrected; see `pdf-page-count-correction.md`.
 
 ## Reference evidence
 
 - [KaTeX API](https://katex.org/docs/api) and [options](https://katex.org/docs/options): strict parsing, display mode and error behavior.
 - [OpenStax University Physics 1, §17.4](https://openstax.org/books/university-physics-volume-1/pages/17-4-normal-modes-of-a-standing-sound-wave): displacement boundaries for open/closed pipes.
 - [OpenStax University Physics 3, §3.1](https://openstax.org/books/university-physics-volume-3/pages/3-1-youngs-double-slit-interference) and [§4.3](https://openstax.org/books/university-physics-volume-3/pages/4-3-double-slit-diffraction): interference, diffraction envelope and missing orders.
-- Local source evidence: `public/reference.pdf`, especially pages 21, 26, 28–37, 48–56. Website formulas and independent executable calculations are linked above.
+- Local source evidence: `public/reference.pdf`, especially pages 21, 27, 29–38, 50–58. Website formulas and independent executable calculations are linked above.
 
 ## Modified files
 

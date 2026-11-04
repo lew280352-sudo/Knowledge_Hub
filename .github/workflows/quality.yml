@@ -31,6 +31,7 @@ jobs:
           cache-dependency-path: scripts/validation/requirements.txt
       - run: python -m pip install -r scripts/validation/requirements.txt
       - run: npm run validate:physics
+      - run: npm run validate:pdf-solutions
       - run: npm run validate:math
       - run: npm test
       - run: npm run build

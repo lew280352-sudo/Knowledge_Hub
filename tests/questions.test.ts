@@ -13,7 +13,7 @@ test('all 70 source questions occur once across 20 complete stages', () => {
   assert.ok(stage.pairs.length>=4,stage.id);
   assert.ok(sourceQuestions.some(q=>q.stageId===stage.id));
  }
- assert.deepEqual(sourceQuestions.filter(q=>q.chapter==='waves'&&q.number>=19).map(q=>q.page),[56,56]);
+ assert.deepEqual(sourceQuestions.filter(q=>q.chapter==='waves'&&q.number>=19).map(q=>q.page),[58,58]);
 });
 test('every template matches an independent baseline calculation',()=>{
  assert.equal(Object.keys(fixtures).length,70);
@@ -30,7 +30,7 @@ test('many seeds remain deterministic with unique formatted choices and coherent
   assert.ok(q.choices.includes(q.answer),source.id);
   assert.ok(q.explanation.length>=2,source.id);
   assert.ok(q.prompt.length>20,source.id);
-  assert.ok(q.page>=1&&q.page<=56);
+  assert.ok(q.page>=1&&q.page<=58);
   if(q.numericAnswer!==undefined)assert.ok(Number.isFinite(q.numericAnswer),source.id);
   const exposed=JSON.stringify(publicQuestion(q));
   assert.ok(!exposed.includes('explanation')&&!exposed.includes('numericAnswer')&&!exposed.includes('"answer"'));
@@ -68,10 +68,10 @@ test('distributed PRNG seeds exercise every wavelength scale and phase branch',(
 });
 
 test('reference pages match the current PDF and chapter offsets',()=>{
- for(const source of sourceQuestions)assert.ok(source.page>=1&&source.page<=56,source.id);
- for(const stage of stages)assert.ok(stage.sourcePages.every(page=>page>=1&&page<=56),stage.id);
+ for(const source of sourceQuestions)assert.ok(source.page>=1&&source.page<=58,source.id);
+ for(const stage of stages)assert.ok(stage.sourcePages.every(page=>page>=1&&page<=58),stage.id);
  const pages=Object.fromEntries(sourceQuestions.map(source=>[source.id,source.page]));
- assert.equal(pages['waves-19'],56);assert.equal(pages['wave-optics-7'],20);
- assert.equal(pages['ray-optics-1'],28);assert.equal(pages['ray-optics-20'],37);
- assert.equal(pages['sound-1'],48);assert.equal(pages['sound-20'],55);
+ assert.equal(pages['waves-19'],58);assert.equal(pages['wave-optics-7'],20);
+ assert.equal(pages['ray-optics-1'],29);assert.equal(pages['ray-optics-20'],38);
+ assert.equal(pages['sound-1'],50);assert.equal(pages['sound-20'],57);
 });

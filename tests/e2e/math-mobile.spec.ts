@@ -14,9 +14,9 @@ test('all formula cards and legacy solutions render correctly on touch-sized scr
  await page.goto('/?view=stage&id=s11&tab=learn');await page.locator('.step-link').first().tap();expect((await page.locator('.lesson-content .katex-html').allTextContents()).join(' ')).not.toContain('quad');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
  const active=await (await page.request.post('/api/attempts',{data:{stageId:'s20',count:1}})).json();await page.request.post(`/api/attempts/${active.id}`,{data:{action:'submit',revision:0}});const saved=await (await page.request.get(`/api/attempts/${active.id}`)).json();
  // A test-only old snapshot reproduces the reported legacy typo; no stored record is rewritten.
- const legacy={...saved,questions:saved.questions.map((q:any)=>({...q,formula:'M=v_S/v,quad\\sin\\mu=1/M',page:57}))};await page.route(`**/api/attempts/${active.id}`,route=>route.fulfill({json:legacy}));
+ const legacy={...saved,questions:saved.questions.map((q:any)=>({...q,formula:'M=v_S/v,quad\\sin\\mu=1/M',page:55}))};await page.route(`**/api/attempts/${active.id}`,route=>route.fulfill({json:legacy}));
  await page.goto(`/?view=exam&attempt=${active.id}`);await expect(page.getByRole('heading',{name:'ผลการทำข้อสอบ',exact:true})).toBeVisible();await expect(page.locator('.math-formula .katex-html')).not.toContainText('quad');
- await expect(page.locator('.review-footer .source-link')).toHaveAttribute('href',/page=55$/);
+ await expect(page.locator('.review-footer .source-link')).toHaveAttribute('href',/page=57$/);
  await page.unroute(`**/api/attempts/${active.id}`);expect(await (await page.request.get(`/api/attempts/${active.id}`)).json()).toEqual(saved);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();await context.close();
 });
 

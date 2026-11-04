@@ -1,3 +1,4 @@
 # Offline development check only; no Python runtime is added to the website.
 sympy==1.14.0
 pypdf==6.21.4
+PyMuPDF==2.1

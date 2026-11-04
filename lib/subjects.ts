@@ -2,7 +2,7 @@ import {chapters as physicsChapters,stages as physicsStages,sourceQuestions as p
 import {aiChapters,aiStages,aiSourceQuestions} from './ai-curriculum.ts';
 export const subjects=[
  {id:'ai',title:'ปัญญาประดิษฐ์',subtitle:'การเขียนโปรแกรมปัญญาประดิษฐ์ 1 · บทนำ',description:'AI, ML, DL การเรียนรู้จากข้อมูล และโมเดลภาษา',reference:'/references/ai-01.pdf',chapters:aiChapters,stages:aiStages,questions:aiSourceQuestions,pages:17},
- {id:'physics',title:'ฟิสิกส์',subtitle:'คลื่น · แสง · เสียง',description:'เข้าใจผ่านภาพ ทดลอง เล่นเกม แล้วลองแก้โจทย์',reference:'/reference.pdf',chapters:physicsChapters,stages:physicsStages,questions:physicsQuestions,pages:56},
+ {id:'physics',title:'ฟิสิกส์',subtitle:'คลื่น · แสง · เสียง',description:'เข้าใจผ่านภาพ ทดลอง เล่นเกม แล้วลองแก้โจทย์',reference:'/reference.pdf',chapters:physicsChapters,stages:physicsStages,questions:physicsQuestions,pages:58},
 ];
 export const allStages=subjects.flatMap(s=>s.stages);
 export const allChapters=subjects.flatMap(s=>s.chapters);

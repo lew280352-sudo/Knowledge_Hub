@@ -9,6 +9,7 @@ import subprocess
 from pathlib import Path
 import sympy as s
 from pypdf import PdfReader
+import pymupdf
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = json.loads(subprocess.check_output(
@@ -186,12 +187,13 @@ def check_examples():
     return len(DATA['examples'])+len(first)
 
 if __name__=='__main__':
-    pages=len(PdfReader(ROOT/'public/reference.pdf').pages)
-    assert pages==56,pages
+    reader=PdfReader(ROOT/'public/reference.pdf')
+    pages=len(pymupdf.open(ROOT/'public/reference.pdf'))
+    assert pages==int(reader.trailer['/Root']['/Pages']['/Count'])==58,pages
     assert all(1<=q['page']<=pages for q in DATA['sources'])
     assert all(1<=page<=pages for stage in DATA['stages'] for page in stage['sourcePages'])
     numeric=check_questions();symbolic,dimensions=check_symbolic();examples=check_examples()
-    print(json.dumps({'reference_pdf_pages':pages,'numeric_cases':numeric,'numeric_templates':len(ORACLES),
+    print(json.dumps({'reference_pdf_pages':pages,'text_extractor_pages':len(reader.pages),'numeric_cases':numeric,'numeric_templates':len(ORACLES),
         'concept_templates_reviewed_separately':len(CONCEPTS),'worked_examples':examples,
         'symbolic_identities':symbolic,'dimensional_reference_checks':dimensions,
         'conceptual_correctness_proved_by_algebra':False},indent=2))
